@@ -264,10 +264,11 @@ def serve(app: ApplicationFacade, *, port: int = 8765) -> None:
     try:
         address = f"http://127.0.0.1:{port}"
         if sys.stdout.isatty():
-            print(f"\033[92m  [ READY ]\033[0m SITA is running at \033[96m{address}\033[0m")
-            print("\033[90m  Press Ctrl+C to stop the local server.\033[0m")
+            print(f"\033[92m  [ READY ]\033[0m SITA is running at \033[96m{address}\033[0m", flush=True)
+            print("\033[90m  Press Ctrl+C to stop the local server.\033[0m", flush=True)
         else:
-            print(f"SITA is ready at {address}")
+            print(f"SITA is ready at {address}", flush=True)
+        # Keep this foreground process attached to CMD; it runs until Ctrl+C.
         server.serve_forever()
     except KeyboardInterrupt:
         print("\nSITA stopped")
