@@ -647,6 +647,8 @@ export default function App() {
 
   const gatewayStatus = health?.model_gateway?.status ?? "checking";
   const chatStatus = health?.specialists?.chat?.status ?? "checking";
+  const specialistCount = Object.keys(health?.specialists ?? {}).length;
+  const modelCount = modelStatus?.models?.length ?? 0;
 
   return (
     <div className={"app-shell" + (mobileSidebarOpen ? " sidebar-open" : "") + (inspectorOpen ? " inspector-open" : "")}>
@@ -883,7 +885,18 @@ export default function App() {
             <span className="privacy-hint">OmniRoute may send prompts to configured providers</span>
           </div>
         </form>
-        <footer className="workspace-footer"><span>●</span> SITA is in review-first mode <span className="footer-divider">·</span> Code execution is disabled until a real OS sandbox is available</footer>
+        <footer className="developer-statusbar" aria-label="Workspace status">
+          <div className="statusbar-group">
+            <span className={"statusbar-item " + (gatewayStatus === "healthy" ? "is-good" : "is-warn")}><i /> OmniRoute: {statusLabel(gatewayStatus)}</span>
+            <span className="statusbar-item"><b>⌘</b> {specialistCount} specialists</span>
+            <span className="statusbar-item"><b>◈</b> {modelCount} model routes</span>
+            <span className="statusbar-item"><b>◉</b> Local workspace</span>
+          </div>
+          <div className="statusbar-group statusbar-right">
+            <span className="statusbar-mode">REVIEW-FIRST</span>
+            <span className="statusbar-lock">EXECUTION LOCKED</span>
+          </div>
+        </footer>
       </main>
 
       {inspectorOpen && (

@@ -26,12 +26,18 @@ if defined ESC (
 
 cls
 echo.
-echo %GOLD%   _____ _____ _______   %CYAN%  SITA LOCAL AI WORKSPACE%RESET%
-echo %GOLD%  / ____^|_   _^|__   __^|  %DIM%  Your private, local-first AI assistant%RESET%
-echo %GOLD% ^| (___   ^| ^|    ^| ^|     %DIM%  --------------------------------------%RESET%
-echo %GOLD%  \___ \  ^| ^|    ^| ^|     %GREEN%  STARTUP SEQUENCE%RESET%
-echo %GOLD%  ____) ^| ^| ^|    ^| ^|     %DIM%  Windows edition%RESET%
-echo %GOLD% ^|_____/  ^|_^|    ^|_^|%RESET%
+echo   +------------------------------------------------------------------------+
+echo   ^| %DIM%Welcome to%RESET% %CYAN%SITA%RESET%                                                           ^|
+echo   ^|                                                                        ^|
+echo   ^|   %GOLD%SSSS   III  TTTTT  AAAAA%RESET%                                             ^|
+echo   ^|  %GOLD%S      III    T   A     A%RESET%                                            ^|
+echo   ^|   %GOLD%SSS   III    T   AAAAAAA%RESET%                                            ^|
+echo   ^|      %GOLD%S  III    T   A     A%RESET%                                            ^|
+echo   ^|  %GOLD%SSSS   III    T   A     A%RESET%                                            ^|
+echo   ^|                                                                        ^|
+echo   ^|                         %CYAN%LOCAL AI WORKSPACE%RESET%                             ^|
+echo   ^|   %DIM%Private by design. Local-first by default.%RESET%                            ^|
+echo   +------------------------------------------------------------------------+
 echo.
 
 call :section "Checking project integrity"
