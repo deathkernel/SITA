@@ -3,11 +3,8 @@
 from __future__ import annotations
 
 import json
-import csv
 import mimetypes
 import os
-import platform
-import subprocess
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -54,6 +51,12 @@ class _Handler(BaseHTTPRequestHandler):
                 self._json(403, {"status": "permission_denied", "error": "request origin is not allowed"})
                 return
             self._json(200, self.server.app.skill_catalogue())
+            return
+        if endpoint == "/api/runtime":
+            if not self._local_origin():
+                self._json(403, {"status": "permission_denied", "error": "request origin is not allowed"})
+                return
+            self._json(200, self.server.app.runtime_status())
             return
         if endpoint == "/api/health":
             if not self._local_origin():
@@ -259,72 +262,41 @@ class _Handler(BaseHTTPRequestHandler):
         return
 
 
-def _running_process_rows() -> list[tuple[str, str, str]]:
-    """Return a small, read-only snapshot of the busiest running processes."""
+def _print_runtime_monitor(app: ApplicationFacade) -> None:
+    """Print a truthful startup snapshot of SITA components and active tasks."""
     try:
-        if platform.system() == "Windows":
-            command = (
-                "Get-Process | Sort-Object WorkingSet64 -Descending | "
-                "Select-Object -First 12 "
-                "@{Name='Process';Expression={$_.ProcessName}}, "
-                "@{Name='PID';Expression={$_.Id}}, "
-                "@{Name='MemoryMB';Expression={[math]::Round($_.WorkingSet64 / 1MB, 1)}} | "
-                "ConvertTo-Csv -NoTypeInformation"
-            )
-            result = subprocess.run(
-                ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", command],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=5,
-                check=False,
-            )
-            if result.returncode != 0:
-                return []
-            records = list(csv.DictReader(result.stdout.splitlines()))
-            return [
-                (row["Process"][:24], row["PID"], f'{row["MemoryMB"]} MB')
-                for row in records
-                if row.get("Process") and row.get("PID") and row.get("MemoryMB")
-            ]
+        runtime = app.runtime_status()
+    except Exception:
+        print("\n  SITA RUNTIME MONITOR (status unavailable)\n", flush=True)
+        return
 
-        result = subprocess.run(
-            ["ps", "-eo", "comm=,pid=,rss=", "--sort=-rss"],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=5,
-            check=False,
-        )
-        if result.returncode != 0:
-            return []
-        rows: list[tuple[str, str, str]] = []
-        for line in result.stdout.splitlines()[:12]:
-            parts = line.split()
-            if len(parts) == 3:
-                process, pid, memory_kb = parts
-                rows.append((process[:24], pid, f"{int(memory_kb) / 1024:.1f} MB"))
-        return rows
-    except (OSError, subprocess.SubprocessError, ValueError, csv.Error):
-        return []
-
-
-def _print_running_processes() -> None:
-    """Print a compact process and memory snapshot without blocking startup."""
-    rows = _running_process_rows()
     print()
-    print("  RUNNING PROCESSES  (top 12 by memory)")
-    print("  +--------------------------+----------+------------+")
-    print("  | PROCESS                  | PID      | MEMORY     |")
-    print("  +--------------------------+----------+------------+")
-    if rows:
-        for process, pid, memory in rows:
-            print(f"  | {process:<24} | {pid:>8} | {memory:>10} |")
+    print("  SITA COMPONENTS")
+    print("  +------------------------------+--------------+----------------+")
+    print("  | COMPONENT                    | TYPE         | STATUS         |")
+    print("  +------------------------------+--------------+----------------+")
+    for component in runtime["components"]:
+        print(
+            f"  | {component['name'][:28]:<28} | "
+            f"{component['type'][:12]:<12} | {component['status'][:14]:<14} |"
+        )
+    print("  +------------------------------+--------------+----------------+")
+    print()
+    print(f"  ACTIVE SITA TASKS ({runtime['active_task_count']})")
+    print("  +----------------+----------------------+----------+-----------+")
+    print("  | REQUEST ID     | COMPONENT            | STATUS   | ELAPSED   |")
+    print("  +----------------+----------------------+----------+-----------+")
+    if runtime["active_tasks"]:
+        for task in runtime["active_tasks"]:
+            print(
+                f"  | {task['request_id'][:14]:<14} | "
+                f"{task['component'][:20]:<20} | "
+                f"{task['status'][:8]:<8} | {task['elapsed_seconds']:>7.1f}s |"
+            )
     else:
-        print("  | Process information unavailable                       |")
-    print("  +--------------------------+----------+------------+")
+        print("  | No active SITA tasks                                      |")
+    print("  +----------------+----------------------+----------+-----------+")
+    print("  Runtime API: /api/runtime")
     print()
 
 
@@ -340,7 +312,7 @@ def serve(app: ApplicationFacade, *, port: int = 8765) -> None:
             print("\033[90m  Press Ctrl+C to stop the local server.\033[0m", flush=True)
         else:
             print(f"SITA is ready at {address}", flush=True)
-        _print_running_processes()
+        _print_runtime_monitor(app)
         # Keep this foreground process attached to CMD; it runs until Ctrl+C.
         server.serve_forever()
     except KeyboardInterrupt:
