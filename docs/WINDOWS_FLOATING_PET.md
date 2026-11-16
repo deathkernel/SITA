@@ -2,7 +2,7 @@
 
 ## Scope
 
-The Windows launcher starts TARA-App with a native, always-on-top companion. The pet's idle animation runs locally and does not call an AI provider. A compact icon toolbar sits directly below the pet; selecting compose expands the same floating window to show the conversation and message composer inline, connected to TARA-App's existing loopback \`/api/chat\` endpoint.
+The Windows launcher starts SITA with a native, always-on-top companion. The pet's idle animation runs locally and does not call an AI provider. A compact icon toolbar sits directly below the pet; selecting compose expands the same floating window to show the conversation and message composer inline, connected to SITA's existing loopback \`/api/chat\` endpoint.
 
 This is the first integration slice, not the completed desktop automation engine.
 
@@ -18,11 +18,11 @@ This is the first integration slice, not the completed desktop automation engine
 - Escape or Ctrl+Q: exit the pet and local server.
 - The pet, toolbar, and expanded chat share one floating window; hiding chat leaves the compact pet and toolbar visible. Chat collapses when focus leaves the companion window.
 - The animation is a local visual state indicator, not a claim that the AI can infer arbitrary task completion; success is shown after a successful chat response.
-- If the configured local port is busy, TARA automatically selects an available loopback port for this run.
+- If the configured local port is busy, SITA automatically selects an available loopback port for this run.
 
 ## Network and privacy boundary
 
-- The pet starts the existing TARA HTTP server bound to \`127.0.0.1\`.
+- The pet starts the existing SITA HTTP server bound to \`127.0.0.1\`.
 - The pet accepts only loopback HTTP origins and sends chat requests only after the user submits a message.
 - Chat HTTP redirects are rejected so a local response cannot redirect prompts or history to a non-loopback destination.
 - The request shape matches the existing \`/api/chat\` contract. Attachments are not sent by the pet.

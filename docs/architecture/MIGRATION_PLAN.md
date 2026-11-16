@@ -1,4 +1,4 @@
-# TARA Architecture Migration Plan
+# SITA Architecture Migration Plan
 
 **Status:** Proposed sequence — no source files moved by this document  
 **Rule:** Preserve behavior first; consolidate boundaries second; restructure folders last.

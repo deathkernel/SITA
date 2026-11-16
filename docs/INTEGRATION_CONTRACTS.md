@@ -1,4 +1,4 @@
-# TARA-App Integration Contracts (Draft v1)
+# SITA Integration Contracts (Draft v1)
 
 This document specifies the target API. It does not imply that the adapters are implemented.
 

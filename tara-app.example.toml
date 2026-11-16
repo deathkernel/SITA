@@ -1,5 +1,6 @@
-# Copy to tara-app.toml and adjust only the local settings you need.
-# All TARA language-model inference is routed through the local OmniRoute gateway.
+# Legacy TARA configuration template. Prefer sita.example.toml for new installations.
+# TARA_* environment variable names remain supported for compatibility.
+# All SITA language-model inference is routed through the local OmniRoute gateway.
 # Keep the API key in TARA_OMNIROUTE_API_KEY (environment variable), never here.
 
 [omniroute]
@@ -40,7 +41,7 @@ enable = false
 # timeout_seconds = 30
 #
 # Scoped filesystem (read-only). Set TARA_MCP_FS_ROOTS to a semicolon-separated
-# list of absolute directories before starting TARA.
+# list of absolute directories before starting SITA.
 # [[mcp.servers]]
 # name = "scoped_fs"
 # command = ["{python}", "-m", "tara_app.mcp_servers.scoped_fs_server"]
@@ -149,7 +150,7 @@ id = "study"
 command = ["{python}", "-m", "tara_study"]
 working_directory = "."
 timeout_seconds = 30
-# Optional PDF text extraction: install tara-app-core[study]. Text and Markdown work without it.
+# Optional PDF text extraction: install sita-core[study]. Text and Markdown work without it.
 
 [[modules]]
 id = "weather"

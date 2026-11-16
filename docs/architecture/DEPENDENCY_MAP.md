@@ -1,4 +1,4 @@
-# TARA Source Inventory and Dependency Map
+# SITA Source Inventory and Dependency Map
 
 **Snapshot:** \`architecture/wide-system-blueprint\`  
 **Purpose:** Evidence-based inventory for the next migration phase. This is a source map, not a claim that all import edges have been exhaustively resolved.

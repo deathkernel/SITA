@@ -1,4 +1,4 @@
-name: TARA-App Core CI
+name: SITA Core CI
 
 # Pull-request runs are authoritative for proposed branch changes. Do not let
 # the paired push event cancel the pull-request run; PR updates cancel older PR runs.

@@ -1,4 +1,4 @@
-"""Command-line entry point for the local TARA-App interface."""
+"""Command-line entry point for the local SITA interface."""
 
 from __future__ import annotations
 
@@ -11,8 +11,8 @@ from tara_app.webapp import serve
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(prog="tara-app", description="Run the local TARA-App chat interface")
-    parser.add_argument("--config", type=Path, default=Path("tara-app.toml"), help="path to trusted TARA-App TOML configuration")
+    parser = argparse.ArgumentParser(prog="sita", description="Run the local SITA chat interface")
+    parser.add_argument("--config", type=Path, default=Path("sita.toml"), help="path to trusted SITA TOML configuration")
     parser.add_argument("--port", type=int, default=8765, help="loopback web port (1024-65535)")
     parser.add_argument(
         "--floating-pet",
@@ -20,6 +20,8 @@ def main() -> int:
         help="show the native Windows floating pet instead of the browser interface",
     )
     args = parser.parse_args()
+    if args.config == Path("sita.toml") and not args.config.exists() and Path("tara-app.toml").is_file():
+        args.config = Path("tara-app.toml")
     app = None
     try:
         if args.floating_pet and sys.platform != "win32":
@@ -34,7 +36,7 @@ def main() -> int:
         else:
             serve(app, port=args.port)
     except (RuntimeConfigurationError, OSError, RuntimeError, ValueError) as exc:
-        print(f"TARA-App could not start: {exc}", file=sys.stderr)
+        print(f"SITA could not start: {exc}", file=sys.stderr)
         return 2
     finally:
         if app is not None:

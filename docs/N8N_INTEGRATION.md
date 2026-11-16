@@ -1,10 +1,10 @@
-# TARA ↔ n8n integration
+# SITA ↔ n8n integration
 
 Status: **read-only API adapter foundation**. The adapter is not yet wired into the application facade, HTTP UI, or workflow tool loop.
 
 ## Connection setup
 
-TARA uses the n8n public REST API. Configure these environment variables before launching TARA:
+SITA uses the n8n public REST API. Configure these environment variables before launching SITA:
 
 - `TARA_N8N_BASE_URL`: n8n instance URL, for example `http://127.0.0.1:5678` for a local instance or `https://your-instance.example` for HTTPS hosting.
 - `TARA_N8N_API_KEY`: API key created in n8n under **Settings → n8n API**.
@@ -36,4 +36,4 @@ These operations must not be added until each has a separate policy decision, ex
 - [n8n API authentication](https://docs.n8n.io/api/authentication/)
 - [n8n public API reference](https://docs.n8n.io/api/)
 
-The public API requires an API key in `X-N8N-API-KEY`. API availability depends on the n8n edition/trial status; verify the API menu exists on the target instance before configuring TARA.
+The public API requires an API key in `X-N8N-API-KEY`. API availability depends on the n8n edition/trial status; verify the API menu exists on the target instance before configuring SITA.

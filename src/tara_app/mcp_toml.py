@@ -1,4 +1,4 @@
-"""Load the optional [mcp] section from a TARA TOML config file."""
+"""Load the optional [mcp] section from a SITA TOML config file."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,7 +19,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 not supported
 
 
 def load_mcp_config_from_toml(path: Path | str, *, require_ready: bool = False) -> McpRegistryConfig:
-    """Parse only the ``[mcp]`` table from ``tara-app.toml``.
+    """Parse only the ``[mcp]`` table from ``sita.toml``.
 
     Missing file or missing ``[mcp]`` table → disabled default config.
     Invalid MCP tables raise ``McpConfigError``.

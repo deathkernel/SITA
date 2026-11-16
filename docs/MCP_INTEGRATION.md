@@ -7,7 +7,7 @@ Status: **foundation + read-only HTTP discovery** (tool execution remains disabl
 | Module | Role |
 |--------|------|
 | `tara_app.mcp_registry` | Parse/validate `[mcp]` allowlist; disabled by default |
-| `tara_app.mcp_toml` | Load `[mcp]` from `tara-app.toml` via `tomllib` |
+| `tara_app.mcp_toml` | Load `[mcp]` from `sita.toml` via `tomllib` |
 | `tara_app.mcp_client.McpToolGateway` | `list_tools` / `call_tool`; execution requires an opaque app-issued approval grant |
 | `tara_app.tool_loop` | Bounded multi-step tool plan validation and sequential runner |
 
@@ -65,7 +65,7 @@ python -m unittest discover -s tests -p "test_mcp_time_server.py" -v
 
 ## External integration catalogue (templates, not enabled servers)
 
-TARA's generic stdio gateway can connect to trusted third-party MCP servers. These
+SITA's generic stdio gateway can connect to trusted third-party MCP servers. These
 entries are integration targets, **not claims that credentials, setup, or a
 working connection are already present**. Keep MCP disabled until each server is
 installed, its command is reviewed, and the user-facing approval/audit gate is
@@ -100,12 +100,12 @@ Before adding a server to a user's local `[[mcp.servers]]` configuration:
    non-mutating tool names to `read_only_tools`; tool descriptions alone do not
    prove safety.
 6. Keep writes, browser submissions, shell/terminal, and administrative actions
-   disabled until the confirmation UI, TARA-Security decision, and audit event
+   disabled until the confirmation UI, SITA Security decision, and audit event
    are wired end-to-end.
 7. Test denial paths, timeouts, oversized outputs, credential redaction, and
    server shutdown before enabling it.
 
-**Current limitation:** TARA's approval-token issuer currently permits only
+**Current limitation:** SITA's approval-token issuer currently permits only
 explicitly allowlisted read-only tools. Writable-server approval, the MCP
 confirmation UI, and end-to-end audit integration are not complete. Therefore
 the catalogue above must not be interpreted as permission to enable write
@@ -113,4 +113,4 @@ operations. The HTTP API exposes discovery only; HTTP tool execution remains
 disabled.
 
 For current built-in server implementations and exact local configuration,
-see the sections above and `tara-app.example.toml`.
+see the sections above and `sita.example.toml`.

@@ -1,4 +1,4 @@
-"""Conversation-only runtime for TARA."""
+"""Conversation-only runtime for SITA."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -9,7 +9,7 @@ from .token_budget import ContextBudgetError, ContextSection, estimate_tokens, p
 
 
 DEFAULT_SYSTEM_PROMPT = (
-    "You are TARA, a precise conversational assistant. "
+    "You are SITA, a precise conversational assistant. "
     "Goal: answers that are simple, polished, and correct—not long or showy.\n\n"
     "Core rules:\n"
     "1. Lead with the direct answer or takeaway in the first sentence or two.\n"
@@ -168,7 +168,7 @@ class TARABrain:
             plan = self._build_context(prompt, recalled, max_new_tokens)
         except ContextBudgetError as exc:
             raise ValueError(
-                "The current request and system instructions exceed TARA's configured context budget; "
+                "The current request and system instructions exceed SITA's configured context budget; "
                 "increase the budget or shorten the request."
             ) from exc
 
@@ -181,7 +181,7 @@ class TARABrain:
         if not isinstance(text, str) or not text.strip():
             raise RuntimeError("The language provider returned an empty response")
 
-        self.conversation_history.extend((("User", prompt.strip()), ("TARA", text.strip())))
+        self.conversation_history.extend((("User", prompt.strip()), ("SITA", text.strip())))
         self.conversation_history = self.conversation_history[-self.max_history_turns * 2:]
         if remember_key is not None:
             self.memory.remember(remember_key, prompt.strip(), importance=importance)

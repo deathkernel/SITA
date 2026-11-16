@@ -98,7 +98,7 @@ class N8nReadOnlyClient:
             headers={
                 "Accept": "application/json",
                 "X-N8N-API-KEY": self._settings.api_key,
-                "User-Agent": "TARA-App-n8n-adapter/1.0",
+                "User-Agent": "SITA-n8n-adapter/1.0",
             },
             method="GET",
         )
