@@ -8,7 +8,10 @@ later steps.
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
+from time import monotonic
 from typing import Any, Mapping, Sequence
+from uuid import uuid4
 
 from tara_app.contracts import AdapterHealth, ModuleRequest
 
@@ -18,6 +21,8 @@ class ApplicationFacade:
 
     def __init__(self, coordinator: Any) -> None:
         self._coordinator = coordinator
+        self._active_tasks: dict[str, dict[str, Any]] = {}
+        self._active_tasks_lock = Lock()
 
     @staticmethod
     def _adapter_health(adapter: Any) -> AdapterHealth:
@@ -194,15 +199,65 @@ class ApplicationFacade:
             skill_prompt = load_skill_pack(
                 skill.strip(), skills_root=default_skills_root()
             ).prompt_block()
+        operation_id = request_id or str(uuid4())
+        started_at = monotonic()
+        with self._active_tasks_lock:
+            self._active_tasks[operation_id] = {
+                "request_id": operation_id,
+                "component": "SITA Orchestrator",
+                "task": "Request dispatch",
+                "status": "running",
+                "started_at": started_at,
+            }
         request = {
             "session_id": session_id,
             "attachments": attachments,
             "workspace_root": workspace_root,
-            "request_id": request_id,
+            "request_id": operation_id,
         }
         if skill_prompt is not None:
             request["skill_prompt"] = skill_prompt
-        return self._coordinator.handle_question(question, **request)
+        try:
+            return self._coordinator.handle_question(question, **request)
+        finally:
+            with self._active_tasks_lock:
+                self._active_tasks.pop(operation_id, None)
+
+    def runtime_status(self) -> dict[str, Any]:
+        """Return registered SITA components and a prompt-free active-task snapshot."""
+        health = self.health_status()
+        now = monotonic()
+        with self._active_tasks_lock:
+            tasks = [
+                {
+                    "request_id": item["request_id"],
+                    "component": item["component"],
+                    "task": item["task"],
+                    "status": item["status"],
+                    "elapsed_seconds": round(max(0.0, now - item["started_at"]), 1),
+                }
+                for item in self._active_tasks.values()
+            ]
+        components = [
+            {"name": "SITA-Router / Orchestrator", "type": "Core", "status": "ready"},
+        ]
+        for name, specialist in health["specialists"].items():
+            components.append({
+                "name": f"{name.title()} Agent",
+                "type": "AI Agent",
+                "status": specialist["status"],
+            })
+        components.append({
+            "name": "OmniRoute Gateway",
+            "type": "Model Gateway",
+            "status": health["model_gateway"]["status"],
+        })
+        return {
+            "status": health["status"],
+            "components": components,
+            "active_task_count": len(tasks),
+            "active_tasks": tasks,
+        }
 
     def list_skills(self) -> list[dict[str, str]]:
         """Return available skill pack summaries (instructions not expanded)."""
