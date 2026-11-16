@@ -239,7 +239,7 @@ class ApplicationFacade:
                 for item in self._active_tasks.values()
             ]
         components = [
-            {"name": "SITA-Router / Orchestrator", "type": "Core", "status": "ready"},
+            {"name": "SITA-Router / Orchestrator", "type": "Core", "status": "initialized"},
         ]
         for name, specialist in health["specialists"].items():
             components.append({
