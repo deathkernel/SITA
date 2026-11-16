@@ -26,13 +26,10 @@ if defined ESC (
 
 cls
 echo.
-echo %GOLD%   SSSS   IIIII  TTTTT  AAAAA%RESET%
-echo %GOLD%  S      III      T    A     A%RESET%
-echo %GOLD%   SSS   III      T    AAAAAAA%RESET%
-echo      S   III      T    A     A%RESET%
-echo %GOLD%  SSSS   IIIII    T    A     A%RESET%
-echo %CYAN%  LOCAL AI WORKSPACE%RESET%
-echo %DIM%  Your private, local-first AI assistant%RESET%
+echo %DIM%  +------------------------------------------------------------------+%RESET%
+echo %DIM%  ^|%RESET% %CYAN% SITA %RESET%%DIM% ^| DEVELOPER WORKSPACE                                      ^|%RESET%
+echo %DIM%  ^|%RESET%   Local-first AI environment                                  %DIM%^|%RESET%
+echo %DIM%  +------------------------------------------------------------------+%RESET%
 echo.
 
 call :section "Checking project integrity"
