@@ -205,7 +205,7 @@ class Orchestrator(McpOrchestratorMixin):
                     "unavailable",
                     decision,
                     "local_model_unavailable",
-                    "SITA-App could not prepare the selected local model. Check the Models panel for download status.",
+                    "SITA could not prepare the selected local model. Check the Models panel for download status.",
                 )
 
         if not (decision.module == "chat" and decision.action == "audit_repository"):

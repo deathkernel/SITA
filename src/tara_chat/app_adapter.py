@@ -1,4 +1,4 @@
-"""SITA-App boundary for the independent SITA-Chat conversation engine."""
+"""SITA boundary for the independent SITA-Chat conversation engine."""
 from __future__ import annotations
 import json
 import os

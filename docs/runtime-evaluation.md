@@ -1,10 +1,10 @@
 # Runtime and Development Options
 
-Research notes checked on 2026-10-26. These products are optional references; SITA-App does not install, invoke, or depend on them automatically.
+Research notes checked on 2026-10-26. These products are optional references; SITA does not install, invoke, or depend on them automatically.
 
 ## Amp
 
-Amp offers a free Hobby tier. Its pricing page lists remote orb use as pay-as-you-go and user-owned runners as free. Treat Amp as an optional way to develop or review SITA repositories; its usage and model-provider costs are separate from SITA-App. Amp is not a SITA model provider or a dependency of the SITA-App runtime.
+Amp offers a free Hobby tier. Its pricing page lists remote orb use as pay-as-you-go and user-owned runners as free. Treat Amp as an optional way to develop or review SITA repositories; its usage and model-provider costs are separate from SITA. Amp is not a SITA model provider or a dependency of the SITA runtime.
 
 Source: [Amp pricing](https://ampcode.com/pricing).
 
@@ -28,7 +28,7 @@ Sources: [TorchNeuron overview](https://awsdocs-neuron.readthedocs-hosted.com/en
 
 ## SITA integration decisions
 
-- SITA-App owns provider selection and capability routing; specialist repositories stay independently installable.
+- SITA owns provider selection and capability routing; specialist repositories stay independently installable.
 - Provider backends require explicit configuration, compatible hardware/runtime, health checks, and offline contract coverage before they appear as available capabilities.
 - Research, Voice, and Action modules stay disabled until the local app configuration opts in. Action writes also require an allowlisted repository and a separate one-time user approval.
 - Any future code execution uses a dedicated, reviewed sandbox contract. A developer's Copilot sandbox setup is not silently reused as SITA's execution guarantee.

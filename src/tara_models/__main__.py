@@ -58,7 +58,7 @@ def _http_json(url: str, *, api_key: str, method: str = "GET", body: dict[str, A
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "SITA-App/0.1",
+            "User-Agent": "SITA/0.1",
         },
         method=method,
     )

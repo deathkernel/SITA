@@ -232,7 +232,7 @@ int runDoctor() {
               << (context.root.empty() ? "not detected" : context.root.string())
               << "\n";
 
-    // The SITA-App diagnosis adapter is read-only: do not persist a Handler history entry.
+    // The SITA diagnosis adapter is read-only: do not persist a Handler history entry.
     return 0;
 }
 

@@ -22,7 +22,7 @@ The JavaScript/TypeScript and C/C++ extractors are intentionally best-effort syn
 
 ## Usage
 
-Install SITA-App in editable mode, then run:
+Install SITA in editable mode, then run:
 
 ```powershell
 python -m pip install -e .

@@ -1,7 +1,7 @@
 # TN-86 — SITA Neural & Cognitive Architecture
 
 > **Status:** Vision and architecture proposal — not an implementation claim.  
-> **Repository:** [deathkernel/SITA-App](https://github.com/deathkernel/TARA-App)  
+> **Repository:** [deathkernel/SITA](https://github.com/deathkernel/TARA-App)  
 > **Core constraint:** OmniRoute remains the single gateway for all language-model inference.
 
 TN-86 is the proposed brain-inspired intelligence architecture for SITA. Its goal is to make SITA more than a user interface that forwards prompts to an AI model: SITA should own a structured cognitive runtime for processing information, maintaining context, retrieving and consolidating memory, coordinating reasoning, learning from approved experience, and making decisions.
@@ -12,7 +12,7 @@ The name **TN-86** is inspired by the commonly cited estimate of roughly 86 bill
 
 ## 1. Vision
 
-Build a high-performance, modular, brain-inspired cognitive system inside the existing SITA-App repository.
+Build a high-performance, modular, brain-inspired cognitive system inside the existing SITA repository.
 
 TN-86 should aim to provide:
 
@@ -150,11 +150,11 @@ TN-86 must preserve SITA's existing security and approval model.
 - Secrets, credentials, raw approval tokens, and private user content must not be written to diagnostic logs.
 - Model-generated plans and code remain proposals until separately validated and approved.
 
-## 8. Integration rules for the existing SITA-App
+## 8. Integration rules for the existing SITA
 
 This is an architectural evolution of the existing application, not permission to discard working features or perform an unrelated rewrite.
 
-1. Keep the existing SITA-App repository as the single source of implementation.
+1. Keep the existing SITA repository as the single source of implementation.
 2. Preserve the existing UI, specialist capabilities, OmniRoute integration, and security boundaries unless a reviewed change proves a modification is necessary.
 3. Inspect current modules and their actual runtime connections before designing replacements.
 4. Consolidate overlapping orchestration paths only after tracing callers, contracts, and tests.

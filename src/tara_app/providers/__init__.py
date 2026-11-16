@@ -1,1 +1,1 @@
-"""Provider adapters for SITA-App."""
+"""Provider adapters for SITA."""
