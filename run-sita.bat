@@ -26,10 +26,18 @@ if defined ESC (
 
 cls
 echo.
-echo   %CYAN%SITA%RESET%
-echo   %DIM%LOCAL AI WORKSPACE%RESET%
-echo   ------------------------------------------------------------
-echo   %DIM%Private by design. Local-first by default.%RESET%
+echo   +------------------------------------------------------------------------+
+echo   ^| %DIM%Welcome to%RESET% %CYAN%SITA%RESET%                                                           ^|
+echo   ^|                                                                        ^|
+echo   ^|   %GOLD%SSSS   III  TTTTT  AAAAA%RESET%                                             ^|
+echo   ^|  %GOLD%S      III    T   A     A%RESET%                                            ^|
+echo   ^|   %GOLD%SSS   III    T   AAAAAAA%RESET%                                            ^|
+echo   ^|      %GOLD%S  III    T   A     A%RESET%                                            ^|
+echo   ^|  %GOLD%SSSS   III    T   A     A%RESET%                                            ^|
+echo   ^|                                                                        ^|
+echo   ^|                         %CYAN%LOCAL AI WORKSPACE%RESET%                             ^|
+echo   ^|   %DIM%Private by design. Local-first by default.%RESET%                            ^|
+echo   +------------------------------------------------------------------------+
 echo.
 
 call :section "Checking project integrity"
