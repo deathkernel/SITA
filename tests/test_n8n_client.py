@@ -127,12 +127,15 @@ class N8nReadOnlyClientTests(unittest.TestCase):
         with self.assertRaises(N8nApiError):
             self.client.list_workflows()
 
-    @patch("tara_app.n8n_client.build_opener")
-    def test_sends_api_key_header_and_get_only(self, build_opener) -> None:
-        opener = build_opener.return_value
-        opener.open.return_value = FakeResponse({"data": []})
-        self.client._get("workflows", {"limit": 1})
-        request = opener.open.call_args.args[0]
+    def test_sends_api_key_header_and_get_only(self) -> None:
+        with patch.object(
+            self.client._opener,
+            "open",
+            return_value=FakeResponse({"data": []}),
+        ) as open_request:
+            self.client._get("workflows", {"limit": 1})
+
+        request = open_request.call_args.args[0]
         self.assertEqual(request.method, "GET")
         self.assertEqual(request.get_header("X-n8n-api-key"), "test-api-key")
 
