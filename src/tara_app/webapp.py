@@ -283,19 +283,20 @@ def _print_runtime_monitor(app: ApplicationFacade) -> None:
     print("  +------------------------------+--------------+----------------+")
     print()
     print(f"  ACTIVE SITA TASKS ({runtime['active_task_count']})")
-    print("  +----------------+----------------------+----------+-----------+")
-    print("  | REQUEST ID     | COMPONENT            | STATUS   | ELAPSED   |")
-    print("  +----------------+----------------------+----------+-----------+")
+    print("  +----------------+----------------------+----------------------+----------+-----------+")
+    print("  | REQUEST ID     | COMPONENT            | TASK                 | STATUS   | ELAPSED   |")
+    print("  +----------------+----------------------+----------------------+----------+-----------+")
     if runtime["active_tasks"]:
         for task in runtime["active_tasks"]:
             print(
                 f"  | {task['request_id'][:14]:<14} | "
                 f"{task['component'][:20]:<20} | "
+                f"{task['task'][:20]:<20} | "
                 f"{task['status'][:8]:<8} | {task['elapsed_seconds']:>7.1f}s |"
             )
     else:
-        print("  | No active SITA tasks                                      |")
-    print("  +----------------+----------------------+----------+-----------+")
+        print("  | No active SITA tasks                                                                  |")
+    print("  +----------------+----------------------+----------------------+----------+-----------+")
     print("  Runtime API: /api/runtime")
     print()
 
