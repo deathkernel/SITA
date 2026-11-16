@@ -1,4 +1,4 @@
-"""Opt-in, allowlisted MCP server registry for TARA-App.
+"""Opt-in, allowlisted MCP server registry for SITA-App.
 
 This module is the safety boundary for Model Context Protocol servers:
 

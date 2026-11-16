@@ -14,7 +14,7 @@ class OmniRouteProviderTests(unittest.TestCase):
 
         def transport(url, payload, api_key, timeout):
             calls.append((url, payload, api_key, timeout))
-            return {"choices": [{"message": {"content": "Hello from TARA"}}]}
+            return {"choices": [{"message": {"content": "Hello from SITA"}}]}
 
         provider = OmniRouteProvider(
             api_key="test-key",
@@ -22,17 +22,17 @@ class OmniRouteProviderTests(unittest.TestCase):
         )
         result = provider.complete(
             "Hi",
-            system="You are TARA",
+            system="You are SITA",
             max_completion_tokens=128,
             temperature=0.2,
         )
 
-        self.assertEqual(result, "Hello from TARA")
+        self.assertEqual(result, "Hello from SITA")
         url, payload, key, timeout = calls[0]
         self.assertEqual(url, "http://127.0.0.1:20128/v1/chat/completions")
         self.assertEqual(payload["model"], "auto")
         self.assertEqual(payload["stream"], False)
-        self.assertEqual(payload["messages"][0], {"role": "system", "content": "You are TARA"})
+        self.assertEqual(payload["messages"][0], {"role": "system", "content": "You are SITA"})
         self.assertEqual(key, "test-key")
         self.assertEqual(timeout, 180.0)
 

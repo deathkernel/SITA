@@ -11,7 +11,7 @@ body {
 button, textarea { font: inherit; }
 .shell { display: flex; flex-direction: column; width: min(100%, 1024px); height: 100%; margin: 0 auto; padding: 0 26px; }
 .topbar { display: flex; align-items: center; gap: 13px; height: 78px; border-bottom: 1px solid var(--line); flex: 0 0 auto; }
-.brand-mark { display: grid; width: 39px; height: 39px; place-items: center; border-radius: 13px; color: #160f23; background: linear-gradient(140deg, #e2d5ff, #aa80fa); font-weight: 800; font-size: 21px; box-shadow: 0 0 26px #be9afc44; }
+.brand-mark { display: block; width: 39px; height: 39px; object-fit: contain; border-radius: 10px; background: transparent; box-shadow: none; }
 .topbar h1 { margin: 0; font-size: 17px; letter-spacing: .08em; }
 .topbar p { margin: 1px 0 0; color: var(--muted); font-size: 12px; }
 .local-badge { margin-left: auto; padding: 6px 10px; border: 1px solid #343740; border-radius: 20px; color: #c5c7d0; font-size: 11px; }
@@ -134,7 +134,7 @@ html, body { height: 100%; overflow: hidden; }
   background: #111216;
 }
 .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 2px 5px 12px; font-size: 15px; font-weight: 700; letter-spacing: .04em; }
-.sidebar-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 10px; color: #160f23; background: linear-gradient(140deg, #e2d5ff, #aa80fa); font-weight: 800; }
+.sidebar-mark { display: block; width: 30px; height: 30px; object-fit: contain; border-radius: 9px; background: transparent; }
 .new-chat-button {
   display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px 11px;
   border: 1px solid #3b3e48; border-radius: 11px; background: #1a1c21;
@@ -221,8 +221,9 @@ html, body { height: 100%; overflow: hidden; }
 body { background: var(--bg); }
 .sidebar { background: #171717; border-right-color: #303030; }
 .brand-mark, .sidebar-mark {
-  color: #111111;
-  background: #ffffff;
+  display: block;
+  object-fit: contain;
+  background: transparent;
   box-shadow: none;
 }
 .local-badge { border-color: #3b3b3b; color: #d4d4d4; }
@@ -286,7 +287,7 @@ body { background: var(--bg); color: var(--text); }
   background: #171717; border-right: 0;
 }
 .sidebar-brand { padding: 5px 9px 15px; font-size: 16px; letter-spacing: 0; }
-.sidebar-mark { width: 28px; height: 28px; border-radius: 50%; color: #171717; background: #f5f5f5; }
+.sidebar-mark { width: 28px; height: 28px; border-radius: 8px; }
 .new-chat-button {
   min-height: 42px; border: 1px solid #454545; border-radius: 10px;
   background: transparent; color: #ededed; font-size: 13px;
@@ -305,7 +306,7 @@ body { background: var(--bg); color: var(--text); }
   height: 58px; min-height: 58px; padding: 0 22px; gap: 10px;
   border-bottom: 0; background: #212121;
 }
-.brand-mark { width: 28px; height: 28px; border-radius: 50%; background: #f2f2f2; color: #202020; box-shadow: none; font-size: 15px; }
+.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: transparent; box-shadow: none; }
 .topbar h1 { font-size: 15px; letter-spacing: 0; }
 .topbar p { display: none; }
 .local-badge { margin-left: auto; border: 1px solid #494949; color: #bdbdbd; background: transparent; }

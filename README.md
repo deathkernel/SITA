@@ -1,5 +1,7 @@
 # SITA
 
+![SITA brand mark](frontend/public/sita-mark.svg)
+
 **SITA is the user-facing AI assistant/application, not an AI model.** SITA owns conversations, specialist capabilities, memory, permissions, and local desktop actions. OmniRoute is the only language-model gateway: it selects the underlying provider/model and returns inference results to SITA.
 
 Chat, Code, Handler, Router, and the other specialist capabilities are maintained as components inside this `SITA` repository. The app must not depend on deleted sibling model repositories or private cross-repository imports. Chat is a conversation runtime, Code is a coding specialist, and Handler is a deterministic native developer-environment tool; these are not all individual AI models. Actual model inventory and runtime support must be discovered/configured explicitly.

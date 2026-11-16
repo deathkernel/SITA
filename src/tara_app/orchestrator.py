@@ -165,7 +165,7 @@ class Orchestrator(McpOrchestratorMixin):
         try:
             decision = self.router.route(route_input)
         except Exception:
-            return self._outcome(operation_id, "unavailable", None, "router_unavailable", "TARA-Router is unavailable")
+            return self._outcome(operation_id, "unavailable", None, "router_unavailable", "SITA-Router is unavailable")
 
         if not isinstance(decision, RouteDecision):
             return self._outcome(operation_id, "failed", None, "invalid_router_response", "Router returned an invalid decision")
@@ -192,9 +192,9 @@ class Orchestrator(McpOrchestratorMixin):
         if capability is None or adapter is None:
             return self._outcome(operation_id, "unavailable", decision, "capability_unavailable", "Selected capability is not registered")
         if (not capability.read_only or capability.requires_approval) and not decision.requires_approval:
-            return self._outcome(operation_id, "permission_denied", decision, "approval_route_required", "Side-effecting capabilities must be assessed by TARA-Security first")
+            return self._outcome(operation_id, "permission_denied", decision, "approval_route_required", "Side-effecting capabilities must be assessed by SITA Security first")
         if decision.requires_approval and decision.module != "security":
-            return self._outcome(operation_id, "permission_denied", decision, "policy_route_invalid", "Approval-gated route bypassed TARA-Security")
+            return self._outcome(operation_id, "permission_denied", decision, "policy_route_invalid", "Approval-gated route bypassed SITA Security")
 
         if self.model_catalog is not None and decision.module in self.model_catalog.profiles:
             try:
@@ -205,7 +205,7 @@ class Orchestrator(McpOrchestratorMixin):
                     "unavailable",
                     decision,
                     "local_model_unavailable",
-                    "TARA-App could not prepare the selected local model. Check the Models panel for download status.",
+                    "SITA-App could not prepare the selected local model. Check the Models panel for download status.",
                 )
 
         if not (decision.module == "chat" and decision.action == "audit_repository"):
@@ -284,7 +284,7 @@ class Orchestrator(McpOrchestratorMixin):
             if result.status != "success":
                 return DispatchOutcome(result.status, decision, result, operation_id)
             if verdict not in {"allow", "approval_required"} or not decision.intended_module or not decision.intended_action:
-                return self._outcome(operation_id, "failed", decision, "invalid_security_response", "TARA-Security did not return a valid assessment")
+                return self._outcome(operation_id, "failed", decision, "invalid_security_response", "SITA Security did not return a valid assessment")
             target_capability = self.registry.capability(decision.intended_module, decision.intended_action)
             target_adapter = self.registry.adapter(decision.intended_module)
             if target_capability is None or target_adapter is None or (target_capability.read_only and not target_capability.requires_approval):
@@ -330,7 +330,7 @@ class Orchestrator(McpOrchestratorMixin):
                     "approval_description": self._approval_description(decision.intended_module, decision.intended_action, target_inputs),
                     "expires_in_seconds": 120,
                 },
-                error="TARA-Security assessed the request; approve it explicitly to continue",
+                error="SITA Security assessed the request; approve it explicitly to continue",
             )
             return DispatchOutcome("approval_required", decision, pending, operation_id)
 
@@ -382,7 +382,7 @@ class Orchestrator(McpOrchestratorMixin):
             module=pending.target_module,
             action=pending.target_action,
             reason_code="human_approved",
-            reason="The user approved this one operation after TARA-Security assessment.",
+            reason="The user approved this one operation after SITA Security assessment.",
             policy_tags=pending.route.policy_tags,
         )
         return DispatchOutcome(result.status, approved_route, result, pending.request_id)

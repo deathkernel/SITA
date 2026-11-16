@@ -1,10 +1,10 @@
-# OpenAI Repository Integration Plan for TARA
+# OpenAI Repository Integration Plan for SITA
 
-This document records the OpenAI public repositories selected for TARA and how each should be evaluated and adopted. It is an implementation manifest, not a claim that every upstream repository has already been embedded or that every model is free to run on all hardware.
+This document records the OpenAI public repositories selected for SITA and how each should be evaluated and adopted. It is an implementation manifest, not a claim that every upstream repository has already been embedded or that every model is free to run on all hardware.
 
 ## Integration principles
 
-- Keep TARA local-first and provider-neutral. Local inference must continue working without an OpenAI API key.
+- Keep SITA local-first and provider-neutral. Local inference must continue working without an OpenAI API key.
 - Prefer stable package dependencies or narrow adapters over copying whole repositories.
 - Verify each upstream license, maintenance status, supported runtime, security requirements, model terms, and hardware needs before enabling code.
 - Make network-hosted inference opt-in and configuration-driven; a free SDK does not make hosted inference free.
@@ -14,18 +14,18 @@ This document records the OpenAI public repositories selected for TARA and how e
 
 ## Selected repository inventory
 
-| Category | Upstream repository | Intended TARA use | Adoption path | Free/local notes | Priority |
+| Category | Upstream repository | Intended SITA use | Adoption path | Free/local notes | Priority |
 |---|---|---|---|---|---|
 | Open-weight language model | https://github.com/openai/gpt-oss | Optional local model profile and model metadata | Keep the model artifact/runtime separate; evaluate Ollama/runtime compatibility, quantization, license and hardware before listing a profile as runnable | Weights are downloadable; local execution needs compatible hardware and storage | P0 |
-| Agent SDK (Python) | https://github.com/openai/openai-agents-python | Optional agent workflow adapter | Map agent/tool calls to TARA's versioned capability contracts; preserve Security approval gates | SDK is open source; inference provider may be paid or local depending on configured endpoint | P0 |
+| Agent SDK (Python) | https://github.com/openai/openai-agents-python | Optional agent workflow adapter | Map agent/tool calls to SITA's versioned capability contracts; preserve Security approval gates | SDK is open source; inference provider may be paid or local depending on configured endpoint | P0 |
 | Agent SDK (TypeScript) | https://github.com/openai/openai-agents-js | TypeScript workflows where useful | Optional frontend/backend integration; do not duplicate the Python orchestration path without a clear use case | SDK is free; runtime inference provider varies | P1 |
 | Coding agent | https://github.com/openai/codex | Coding workflow research and possible isolated coding adapter | Evaluate sandboxing, authentication and model requirements; do not give the agent unrestricted host access | Requirements depend on deployment/model access | P0 review |
-| Speech-to-text | https://github.com/openai/whisper | Optional local transcription | Prefer the existing TARA Voice interface; keep runtime/dependencies optional and test supported Python/platform combinations | Local inference possible; model weights and compute are required | P1 |
+| Speech-to-text | https://github.com/openai/whisper | Optional local transcription | Prefer the existing SITA Voice interface; keep runtime/dependencies optional and test supported Python/platform combinations | Local inference possible; model weights and compute are required | P1 |
 | Image/text similarity | https://github.com/openai/CLIP | Optional local image/text retrieval | Add an isolated vision-search adapter; do not replace existing image-understanding features | Local inference possible; model weights and compute required | P2 |
 | Python API SDK | https://github.com/openai/openai-python | Optional OpenAI-compatible remote provider integration | Provider adapter only; keys in local secret store/environment, never logs | SDK free; hosted API can cost money | P2 |
 | JavaScript API SDK | https://github.com/openai/openai-node | Optional Node/TypeScript service integration | Use only where a Node service actually exists; avoid adding a second backend stack just for the SDK | SDK free; hosted API can cost money | P2 |
 | MCP integrations | https://github.com/openai/mcp-extensions | Ideas/examples for external tool integrations | Inspect each extension and add only allowlisted, least-privilege adapters behind capability approval | Public repository; each integration has its own dependencies and access needs | P1 review |
-| Guardrails (Python) | https://github.com/openai/openai-guardrails-python | Optional input/output safety checks | Evaluate alongside TARA Security; normalize results into TARA's policy contract and avoid duplicate conflicting policy layers | Library is free; checks/integrations may need external services | P1 |
+| Guardrails (Python) | https://github.com/openai/openai-guardrails-python | Optional input/output safety checks | Evaluate alongside SITA Security; normalize results into SITA's policy contract and avoid duplicate conflicting policy layers | Library is free; checks/integrations may need external services | P1 |
 | Guardrails (JS) | https://github.com/openai/openai-guardrails-js | JS safety checks if a JS service uses them | Keep optional; do not duplicate Python checks without an explicit boundary | Library is free; integrations vary | P2 |
 | Evaluations | https://github.com/openai/evals | Regression and response-quality test cases | Adapt useful tests to local deterministic fixtures; keep network/API-dependent tests marked separately | Tooling is open source; some evaluations require hosted models | P1 |
 | Cookbook | https://github.com/openai/openai-cookbook | Reference implementations | Extract patterns into small reviewed examples; never import the entire cookbook as a dependency | Examples free; some use paid or online APIs | P1 reference |
@@ -35,9 +35,9 @@ This document records the OpenAI public repositories selected for TARA and how e
 | RL education | https://github.com/openai/spinningup | Tutorials and algorithm research | Documentation/lab only; separate environment from main application | Educational code; training compute required | P3 |
 | RL environments | https://github.com/openai/gym | Legacy research reference | Do not adopt as a new production dependency because the repository is archived; evaluate maintained alternatives such as Gymnasium separately | Archived upstream | P3 |
 | Procedural RL environments | https://github.com/openai/procgen | Research-only agent training environments | Separate optional lab; verify platform compatibility and maintenance | Research code; compute required | P3 |
-| Go SDK | https://github.com/openai/openai-go | Future Go services only | Defer unless a TARA service is intentionally written in Go | SDK free; hosted API can cost money | P3 |
-| .NET SDK | https://github.com/openai/openai-dotnet | Future .NET services only | Defer unless TARA has a .NET service | SDK free; hosted API can cost money | P3 |
-| Java SDK | https://github.com/openai/openai-java | Future Java services only | Defer unless TARA has a Java service | SDK free; hosted API can cost money | P3 |
+| Go SDK | https://github.com/openai/openai-go | Future Go services only | Defer unless a SITA service is intentionally written in Go | SDK free; hosted API can cost money | P3 |
+| .NET SDK | https://github.com/openai/openai-dotnet | Future .NET services only | Defer unless SITA has a .NET service | SDK free; hosted API can cost money | P3 |
+| Java SDK | https://github.com/openai/openai-java | Future Java services only | Defer unless SITA has a Java service | SDK free; hosted API can cost money | P3 |
 | GitHub Actions | https://github.com/openai/codex-action | Optional CI coding-agent experiments | Only in isolated, explicitly configured workflows with secret-scope and write-permission review | Model credentials/configuration may be required | P2 review |
 | CLI | https://github.com/openai/openai-cli | Command-line API workflows | Verify current maintenance and purpose before adopting; CLI is not a required app runtime | API access may be paid | P3 review |
 | Code security | https://github.com/openai/codex-security | Security research/evaluation | Inspect actual README, license, data-flow, and execution model before deciding; do not assume it is a drop-in scanner | Requirements must be validated | P2 review |
@@ -54,14 +54,14 @@ This document records the OpenAI public repositories selected for TARA and how e
 5. Keep gpt-oss optional until target-machine hardware and supported runtime are verified.
 
 ### Batch 2 — Agent and safety adapters (P0/P1)
-1. Prototype one Python Agents SDK adapter behind TARA's capability registry.
-2. Translate tool requests through TARA's contracts rather than executing arbitrary agent tools directly.
-3. Evaluate Guardrails as an optional policy signal, not a replacement for TARA Security.
+1. Prototype one Python Agents SDK adapter behind SITA's capability registry.
+2. Translate tool requests through SITA's contracts rather than executing arbitrary agent tools directly.
+3. Evaluate Guardrails as an optional policy signal, not a replacement for SITA Security.
 4. Add tests for disabled capabilities, timeout, malformed output, denied approval, and unavailable providers.
 5. Review Codex only after a real sandbox runner exists.
 
 ### Batch 3 — Existing local modality features (P1/P2)
-1. Keep TARA Voice's existing interface and optionally expose Whisper as a selectable backend.
+1. Keep SITA Voice's existing interface and optionally expose Whisper as a selectable backend.
 2. Add CLIP as a separate image/text search capability instead of replacing image understanding.
 3. Keep tiktoken optional and record the tokenizer used for each estimate.
 4. Use relevant Evals/Cookbook examples to add local regression fixtures.
@@ -79,7 +79,7 @@ Keep Shap-E, GPT-2, Spinning Up, Gym, Procgen, Swarm and Frontier Evals outside 
 
 - Upstream repository and license reviewed; version/commit pinned.
 - Optional dependency group, not a core dependency, unless proven essential.
-- Versioned TARA contract and explicit capability registration.
+- Versioned SITA contract and explicit capability registration.
 - No hidden downloads, provider activation, external network calls, or mutations on import/startup.
 - Timeouts, cancellation, payload validation, error redaction, resource limits, and audit events.
 - Unit tests with mocked providers plus feature-unavailable tests.
@@ -88,4 +88,4 @@ Keep Shap-E, GPT-2, Spinning Up, Gym, Procgen, Swarm and Frontier Evals outside 
 
 ## Current scope note
 
-This manifest is the plan for adoption. It does not mean all repositories are embedded in TARA or that optional features have been implemented. Implementation should proceed batch by batch after tests and upstream review, keeping the current local-first app functional throughout.
+This manifest is the plan for adoption. It does not mean all repositories are embedded in SITA or that optional features have been implemented. Implementation should proceed batch by batch after tests and upstream review, keeping the current local-first app functional throughout.

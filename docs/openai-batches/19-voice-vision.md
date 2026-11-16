@@ -1,7 +1,7 @@
 # Batch 19 — Voice and vision adapters
 
 ## Scope
-- Whisper: optional local speech-to-text backend behind the existing TARA Voice interface.
+- Whisper: optional local speech-to-text backend behind the existing SITA Voice interface.
 - CLIP: separate image/text similarity-search capability; do not replace image understanding.
 - Shap-E: experimental 3D-generation lab only, outside core runtime.
 

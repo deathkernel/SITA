@@ -1,6 +1,6 @@
 # Source-Code Architecture Explorer
 
-TARA's architecture explorer derives a repository graph from implementation files instead of treating README references as the architecture source of truth.
+SITA's architecture explorer derives a repository graph from implementation files instead of treating README references as the architecture source of truth.
 
 ## What it extracts
 
@@ -22,7 +22,7 @@ The JavaScript/TypeScript and C/C++ extractors are intentionally best-effort syn
 
 ## Usage
 
-Install TARA-App in editable mode, then run:
+Install SITA-App in editable mode, then run:
 
 ```powershell
 python -m pip install -e .

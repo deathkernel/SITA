@@ -218,7 +218,7 @@ def run_floating_pet(app: Any, *, port: int = 8765) -> None:
     )
     transcript.pack(side="top", fill="both", expand=True)
     transcript.tag_configure("user", foreground="#d9c5ff", justify="right", spacing1=8, spacing3=3)
-    transcript.tag_configure("tara", foreground="#f0edf7", justify="left", spacing1=8, spacing3=3)
+    transcript.tag_configure("sita", foreground="#f0edf7", justify="left", spacing1=8, spacing3=3)
     transcript.tag_configure("notice", foreground="#f2c98a", justify="left", spacing1=8, spacing3=3)
     transcript.tag_configure("label", foreground="#b8a3dc", font=("Segoe UI", 8, "bold"), spacing1=5)
 
@@ -240,7 +240,7 @@ def run_floating_pet(app: Any, *, port: int = 8765) -> None:
 
     def append_transcript(speaker: str, message: str) -> None:
         transcript.configure(state="normal")
-        tag = "user" if speaker == "You" else "notice" if speaker == "Notice" else "tara"
+        tag = "user" if speaker == "You" else "notice" if speaker == "Notice" else "sita"
         transcript.insert("end", f"{speaker}\n", ("label",))
         transcript.insert("end", f"{message}\n\n", (tag,))
         content = transcript.get("1.0", "end-1c")
@@ -370,7 +370,7 @@ def run_floating_pet(app: Any, *, port: int = 8765) -> None:
             finally:
                 chat_workers.discard(threading.current_thread())
 
-        worker_thread = threading.Thread(target=worker, name="tara-pet-chat", daemon=True)
+        worker_thread = threading.Thread(target=worker, name="sita-pet-chat", daemon=True)
         chat_workers.add(worker_thread)
         worker_thread.start()
 
@@ -400,8 +400,8 @@ def run_floating_pet(app: Any, *, port: int = 8765) -> None:
         try:
             canvas.delete("all")
             if mini_mode:
-                canvas.create_oval(7, 7, 47, 47, fill="#6b48b7", outline="#c6a5ff", width=2)
-                canvas.create_text(27, 27, text="T", fill="#ffffff", font=("Segoe UI", 16, "bold"))
+                canvas.create_oval(7, 7, 47, 47, fill="#17191f", outline="#d6b47a", width=2)
+                canvas.create_text(27, 27, text="S", fill="#f2d6a5", font=("Segoe UI", 16, "bold"))
                 bell_color = {"ready": "#39d98a", "thinking": "#f4b942", "blocked": "#ff5c68", "success": "#39d98a"}.get(pet_state, "#39d98a")
                 if pet_state == "thinking" and animation_tick % 2:
                     bell_color = "#ffe4a3"
@@ -498,7 +498,7 @@ def run_floating_pet(app: Any, *, port: int = 8765) -> None:
             except (OSError, AttributeError):
                 return
 
-    hotkey_thread = threading.Thread(target=global_hotkey_worker, name="tara-global-hotkey", daemon=True)
+    hotkey_thread = threading.Thread(target=global_hotkey_worker, name="sita-global-hotkey", daemon=True)
     hotkey_thread.start()
 
     def dismiss_chat_on_focus_loss(_event: Any) -> None:

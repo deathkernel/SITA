@@ -1,6 +1,6 @@
 """Safe, opt-in integration with the native TARA-Handler CLI.
 
-TARA remains a conversational assistant. Handler performs deterministic inspection
+SITA remains a conversational assistant. Handler performs deterministic inspection
 and applies its own policy/confirmation checks. This bridge deliberately exposes
 only read-only diagnostic commands; repair and mutation commands are not available
 through natural-language tool dispatch.

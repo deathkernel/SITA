@@ -1,18 +1,18 @@
-# TN-86 — TARA Neural & Cognitive Architecture
+# TN-86 — SITA Neural & Cognitive Architecture
 
 > **Status:** Vision and architecture proposal — not an implementation claim.  
-> **Repository:** [deathkernel/TARA-App](https://github.com/deathkernel/TARA-App)  
+> **Repository:** [deathkernel/SITA-App](https://github.com/deathkernel/TARA-App)  
 > **Core constraint:** OmniRoute remains the single gateway for all language-model inference.
 
-TN-86 is the proposed brain-inspired intelligence architecture for TARA. Its goal is to make TARA more than a user interface that forwards prompts to an AI model: TARA should own a structured cognitive runtime for processing information, maintaining context, retrieving and consolidating memory, coordinating reasoning, learning from approved experience, and making decisions.
+TN-86 is the proposed brain-inspired intelligence architecture for SITA. Its goal is to make SITA more than a user interface that forwards prompts to an AI model: SITA should own a structured cognitive runtime for processing information, maintaining context, retrieving and consolidating memory, coordinating reasoning, learning from approved experience, and making decisions.
 
-The name **TN-86** is inspired by the commonly cited estimate of roughly 86 billion neurons in the human brain. It is a design reference, not a claim that TARA will simulate 86 billion biological neurons.
+The name **TN-86** is inspired by the commonly cited estimate of roughly 86 billion neurons in the human brain. It is a design reference, not a claim that SITA will simulate 86 billion biological neurons.
 
 ---
 
 ## 1. Vision
 
-Build a high-performance, modular, brain-inspired cognitive system inside the existing TARA-App repository.
+Build a high-performance, modular, brain-inspired cognitive system inside the existing SITA-App repository.
 
 TN-86 should aim to provide:
 
@@ -21,17 +21,17 @@ TN-86 should aim to provide:
 - **Memory:** working, episodic, semantic, and associative memory with controlled retrieval and consolidation.
 - **Learning:** measurable, bounded adaptation from approved feedback and experience.
 - **Mathematical intelligence:** deterministic numerical and scientific computation through verified algorithms and suitable libraries.
-- **Multimodal input:** a consistent path for text, images, and voice into TARA's cognitive workflow.
+- **Multimodal input:** a consistent path for text, images, and voice into SITA's cognitive workflow.
 - **Performance:** bounded resource use, cancellation, observability, and repeatable benchmarks.
 
 These are target capabilities. Each must be designed, implemented, tested, and documented before it is described as available.
 
 ## 2. OmniRoute is the only language-model gateway
 
-All language-model requests made by TARA must go through **OmniRoute**.
+All language-model requests made by SITA must go through **OmniRoute**.
 
 ~~~text
-TARA Cognitive Runtime
+SITA Cognitive Runtime
         |
         +--> Cognitive modules, memory, policies and deterministic tools
         |
@@ -44,11 +44,11 @@ TARA Cognitive Runtime
 
 Rules:
 
-1. TARA must not call model providers directly for language-model inference.
-2. TARA must not introduce a second LLM gateway or silently fall back to a direct provider API.
+1. SITA must not call model providers directly for language-model inference.
+2. SITA must not introduce a second LLM gateway or silently fall back to a direct provider API.
 3. Model selection, provider routing, credentials, quotas, and provider fallback remain under OmniRoute's configuration and contract.
-4. TARA owns its cognitive state, memory policies, neural-processing logic, orchestration, permissions, and local deterministic computation.
-5. If OmniRoute is unavailable, TARA must report the model-service failure clearly. Any non-LLM deterministic capability that can safely operate independently may continue.
+4. SITA owns its cognitive state, memory policies, neural-processing logic, orchestration, permissions, and local deterministic computation.
+5. If OmniRoute is unavailable, SITA must report the model-service failure clearly. Any non-LLM deterministic capability that can safely operate independently may continue.
 6. All model calls must use bounded timeouts, cancellation, input/output limits, and redacted audit metadata.
 
 ### Important technical boundary
@@ -57,7 +57,7 @@ OmniRoute is a **model gateway**, not by itself a general-purpose neural-network
 
 Therefore, the intended separation is:
 
-- **TN-86 cognitive/neural runtime:** implemented and executed within TARA's own application/runtime boundary.
+- **TN-86 cognitive/neural runtime:** implemented and executed within SITA's own application/runtime boundary.
 - **Language-model inference:** accessed exclusively through OmniRoute.
 - **Mathematical and deterministic computation:** performed by verified local algorithms/libraries where appropriate.
 
@@ -141,20 +141,20 @@ The target is efficient cognitive capability, not a literal simulation of the hu
 
 ## 7. Safety, permissions, and data boundaries
 
-TN-86 must preserve TARA's existing security and approval model.
+TN-86 must preserve SITA's existing security and approval model.
 
 - Neural or model output must never grant itself permission to execute an action.
-- External actions remain subject to TARA-Security and explicit approval.
+- External actions remain subject to SITA Security and explicit approval.
 - Learning from user data or action outcomes must follow explicit data-retention and consent rules.
 - Memory writes, edits, and forgetting must be auditable and policy-controlled.
 - Secrets, credentials, raw approval tokens, and private user content must not be written to diagnostic logs.
 - Model-generated plans and code remain proposals until separately validated and approved.
 
-## 8. Integration rules for the existing TARA-App
+## 8. Integration rules for the existing SITA-App
 
 This is an architectural evolution of the existing application, not permission to discard working features or perform an unrelated rewrite.
 
-1. Keep the existing TARA-App repository as the single source of implementation.
+1. Keep the existing SITA-App repository as the single source of implementation.
 2. Preserve the existing UI, specialist capabilities, OmniRoute integration, and security boundaries unless a reviewed change proves a modification is necessary.
 3. Inspect current modules and their actual runtime connections before designing replacements.
 4. Consolidate overlapping orchestration paths only after tracing callers, contracts, and tests.
@@ -182,7 +182,7 @@ Each phase must have acceptance criteria and tests before the next phase is trea
 A subsystem is complete only when:
 
 - its design and mathematical assumptions are documented;
-- its implementation is connected to the real TARA runtime;
+- its implementation is connected to the real SITA runtime;
 - unit, integration, failure-path, and resource-bound tests pass;
 - security and approval behavior is verified;
 - performance and correctness benchmarks are recorded;
@@ -190,13 +190,13 @@ A subsystem is complete only when:
 
 ## 11. Current status
 
-This document records the TN-86 vision and proposed architecture only. It does **not** mean that a new neural engine, SNN, STDP learning system, independent model, or biological-scale simulation currently exists in TARA.
+This document records the TN-86 vision and proposed architecture only. It does **not** mean that a new neural engine, SNN, STDP learning system, independent model, or biological-scale simulation currently exists in SITA.
 
 The existing project documentation remains authoritative for the current implementation status. Update this document as architecture decisions are approved and implementation evidence becomes available.
 
 ---
 
-**Guiding principle:** TARA owns the cognitive system. OmniRoute remains the single gateway for language-model inference. TN-86 should be scientifically grounded, resource-aware, testable, secure, and built incrementally.
+**Guiding principle:** SITA owns the cognitive system. OmniRoute remains the single gateway for language-model inference. TN-86 should be scientifically grounded, resource-aware, testable, secure, and built incrementally.
 
 
 ## 12. Scientific disciplines and methods TN-86 will draw from
@@ -283,7 +283,7 @@ Use established methods with explicit evaluation:
 - Calibration, uncertainty estimation, and out-of-distribution detection.
 - Hybrid systems combining deterministic algorithms with OmniRoute-mediated LLM inference.
 
-TARA must distinguish its own implemented learning mechanisms from the capabilities of the external model selected by OmniRoute.
+SITA must distinguish its own implemented learning mechanisms from the capabilities of the external model selected by OmniRoute.
 
 ### 12.7 Biology and evolution — limited, evidence-based inspiration
 

@@ -4,7 +4,7 @@
 Evaluate `openai/openai-agents-python` first. Treat `openai/openai-agents-js` as a separate optional boundary and `openai/swarm` as educational/reference material, not a production dependency by default.
 
 ## Architecture
-- Adapt agent tool requests to TARA's versioned capability contracts.
+- Adapt agent tool requests to SITA's versioned capability contracts.
 - Use the existing capability registry and Security approval flow; SDK tools must not bypass policy.
 - Keep Python orchestration as the first implementation to avoid duplicate agent runtimes.
 - Add JS orchestration only when an actual Node service and ownership boundary are demonstrated.
@@ -15,7 +15,7 @@ Evaluate `openai/openai-agents-python` first. Treat `openai/openai-agents-js` as
 - Mocked unit tests for tool allowlist, denied approval, timeout, cancellation, malformed output, and unavailable provider.
 
 ## Acceptance checks
-- Importing TARA without the extra succeeds.
+- Importing SITA without the extra succeeds.
 - No tools are exposed unless explicitly registered and allowlisted.
 - No direct shell, filesystem mutation, or network tool is granted by default.
 - Local/custom provider use is supported only where the SDK's actual transport permits it; otherwise clearly report the limitation.

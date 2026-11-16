@@ -53,18 +53,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 }
 .sidebar-brand { display: flex; align-items: center; gap: 11px; padding: 0 5px 4px; }
 .brand-mark {
-  display: grid;
+  display: block;
   width: 36px;
   height: 36px;
   flex: 0 0 36px;
-  place-items: center;
-  border: 1px solid #6e5945;
+  object-fit: contain;
+  border: 0;
   border-radius: 11px;
-  background: linear-gradient(145deg, #e1c19d, #b8895f);
+  background: transparent;
   box-shadow: 0 5px 20px #0004;
-  color: #241b14;
-  font-size: 19px;
-  font-weight: 850;
 }
 .sidebar-brand div { display: grid; gap: 2px; }
 .sidebar-brand strong { font-size: 14px; letter-spacing: .14em; }
@@ -515,16 +512,6 @@ button:not(:disabled):active {
   background: linear-gradient(145deg, #f0d1ad 0%, #c69a70 54%, #a97a52 100%);
   box-shadow: 0 5px 20px rgb(0 0 0 / 35%), 0 0 22px rgb(197 151 108 / 13%);
   transition: transform .35s var(--ease-spring), box-shadow .3s ease;
-}
-
-.brand-mark::after {
-  position: absolute;
-  inset: -60% auto -60% -55%;
-  width: 35%;
-  transform: rotate(24deg);
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 55%), transparent);
-  content: "";
-  animation: sita-mark-sheen 7s ease-in-out infinite;
 }
 
 .sidebar-brand:hover .brand-mark {
