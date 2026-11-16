@@ -1,4 +1,4 @@
-"""Loopback health endpoint tests for the local TARA web server."""
+"""Loopback health endpoint tests for the local SITA web server."""
 from __future__ import annotations
 
 import json
@@ -58,7 +58,7 @@ class _App:
                 specialists[module_id] = {"status": "configured"}
         return {
             "status": "ok" if capabilities and gateway_status == "healthy" else "degraded",
-            "app": "TARA-App",
+            "app": "SITA",
             "api_version": "1.0",
             "capability_count": len(capabilities),
             "capabilities": list(capabilities),
@@ -86,7 +86,7 @@ class HealthEndpointTests(unittest.TestCase):
             self.assertEqual(response.status, 200)
             payload = json.loads(response.read().decode("utf-8"))
         self.assertEqual(payload["status"], "ok")
-        self.assertEqual(payload["app"], "TARA-App")
+        self.assertEqual(payload["app"], "SITA")
         self.assertEqual(payload["api_version"], "1.0")
         self.assertEqual(payload["capability_count"], 2)
         self.assertEqual(payload["capabilities"], ["chat.respond", "models.catalog"])

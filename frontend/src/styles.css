@@ -431,7 +431,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 
 /* -------------------------------------------------------------------------- */
-/* TARA premium workspace layer                                               */
+/* SITA premium workspace layer                                               */
 /* -------------------------------------------------------------------------- */
 
 :root {
@@ -524,7 +524,7 @@ button:not(:disabled):active {
   transform: rotate(24deg);
   background: linear-gradient(90deg, transparent, rgb(255 255 255 / 55%), transparent);
   content: "";
-  animation: tara-mark-sheen 7s ease-in-out infinite;
+  animation: sita-mark-sheen 7s ease-in-out infinite;
 }
 
 .sidebar-brand:hover .brand-mark {
@@ -563,7 +563,7 @@ button:not(:disabled):active {
 .new-session:hover::after,
 .send-button:hover::after,
 .approve-button:hover::after {
-  animation: tara-button-sheen .8s ease;
+  animation: sita-button-sheen .8s ease;
 }
 
 .new-session kbd {
@@ -695,7 +695,7 @@ button:not(:disabled):active {
 
 .session-state i {
   box-shadow: 0 0 9px rgb(131 201 167 / 55%);
-  animation: tara-status-breathe 2.8s ease-in-out infinite;
+  animation: sita-status-breathe 2.8s ease-in-out infinite;
 }
 
 .toolbar-button {
@@ -726,7 +726,7 @@ button:not(:disabled):active {
 .notice {
   position: relative;
   z-index: 2;
-  animation: tara-slide-down .25s var(--ease-out) both;
+  animation: sita-slide-down .25s var(--ease-out) both;
 }
 
 .chat-area {
@@ -735,7 +735,7 @@ button:not(:disabled):active {
 }
 
 .welcome {
-  animation: tara-welcome-in .55s var(--ease-out) both;
+  animation: sita-welcome-in .55s var(--ease-out) both;
 }
 
 .welcome-eyebrow {
@@ -747,7 +747,7 @@ button:not(:disabled):active {
 
 .welcome-spark {
   display: inline-block;
-  animation: tara-spark-turn 12s linear infinite;
+  animation: sita-spark-turn 12s linear infinite;
 }
 
 .welcome h1 {
@@ -791,7 +791,7 @@ button:not(:disabled):active {
 }
 
 .starter-grid button:hover::after {
-  animation: tara-card-sheen .7s ease;
+  animation: sita-card-sheen .7s ease;
 }
 
 .starter-icon {
@@ -813,7 +813,7 @@ button:not(:disabled):active {
 }
 
 .message {
-  animation: tara-message-in .32s var(--ease-out) both;
+  animation: sita-message-in .32s var(--ease-out) both;
 }
 
 .message:nth-child(2n) {
@@ -888,7 +888,7 @@ button:not(:disabled):active {
     radial-gradient(ellipse at 100% 0%, rgb(206 158 103 / 11%), transparent 52%),
     linear-gradient(145deg, #2b241b, #211e19);
   box-shadow: 0 10px 28px rgb(0 0 0 / 17%);
-  animation: tara-approval-in .32s var(--ease-out) both;
+  animation: sitaroval-in .32s var(--ease-out) both;
 }
 
 .approval-card::before {
@@ -930,18 +930,18 @@ button:not(:disabled):active {
 }
 
 .working-indicator {
-  animation: tara-message-in .25s var(--ease-out) both;
+  animation: sita-message-in .25s var(--ease-out) both;
 }
 
 .working-pulse {
   box-shadow: 0 0 0 0 rgb(216 177 138 / 32%);
-  animation: tara-working-pulse 1.6s ease-out infinite;
+  animation: sita-working-pulse 1.6s ease-out infinite;
 }
 
 .activity-panel {
   border-top-color: #373d46;
   background: rgb(19 22 26 / 96%);
-  animation: tara-slide-up .22s var(--ease-out) both;
+  animation: sita-slide-up .22s var(--ease-out) both;
 }
 
 .activity-row {
@@ -987,7 +987,7 @@ button:not(:disabled):active {
   background: rgb(27 26 23 / 96%);
   color: #f0d8bc;
   pointer-events: none;
-  animation: tara-drop-in .18s ease-out both;
+  animation: sita-drop-in .18s ease-out both;
 }
 
 .drop-overlay > span {
@@ -1104,7 +1104,7 @@ button:not(:disabled):active {
     #191e24;
   box-shadow: 0 5px 18px rgb(0 0 0 / 9%);
   transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
-  animation: tara-card-in .35s var(--ease-out) both;
+  animation: sita-card-in .35s var(--ease-out) both;
 }
 
 .inspector-card:hover {
@@ -1191,67 +1191,67 @@ select:focus-visible {
   background-clip: padding-box;
 }
 
-@keyframes tara-welcome-in {
+@keyframes sita-welcome-in {
   from { opacity: 0; transform: translateY(12px) scale(.99); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes tara-message-in {
+@keyframes sita-message-in {
   from { opacity: 0; transform: translateY(7px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes tara-card-in {
+@keyframes sita-card-in {
   from { opacity: 0; transform: translateY(7px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes tara-approval-in {
+@keyframes sitaroval-in {
   from { opacity: 0; transform: translateY(7px) scale(.99); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes tara-slide-down {
+@keyframes sita-slide-down {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes tara-slide-up {
+@keyframes sita-slide-up {
   from { opacity: 0; transform: translateY(7px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes tara-drop-in {
+@keyframes sita-drop-in {
   from { opacity: 0; transform: scale(.985); }
   to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes tara-button-sheen {
+@keyframes sita-button-sheen {
   from { transform: translateX(-180%) rotate(22deg); }
   to { transform: translateX(540%) rotate(22deg); }
 }
 
-@keyframes tara-card-sheen {
+@keyframes sita-card-sheen {
   from { transform: translateX(-110%); }
   to { transform: translateX(110%); }
 }
 
-@keyframes tara-mark-sheen {
+@keyframes sita-mark-sheen {
   0%, 72%, 100% { transform: translateX(-180%) rotate(24deg); }
   84% { transform: translateX(480%) rotate(24deg); }
 }
 
-@keyframes tara-spark-turn {
+@keyframes sita-spark-turn {
   from { transform: rotate(0); }
   to { transform: rotate(360deg); }
 }
 
-@keyframes tara-status-breathe {
+@keyframes sita-status-breathe {
   0%, 100% { opacity: .75; }
   50% { opacity: 1; box-shadow: 0 0 12px rgb(131 201 167 / 75%); }
 }
 
-@keyframes tara-working-pulse {
+@keyframes sita-working-pulse {
   0% { box-shadow: 0 0 0 0 rgb(216 177 138 / 35%); }
   70% { box-shadow: 0 0 0 9px rgb(216 177 138 / 0%); }
   100% { box-shadow: 0 0 0 0 rgb(216 177 138 / 0%); }
@@ -1290,7 +1290,7 @@ select:focus-visible {
     border-radius: 0;
     background: rgb(3 5 8 / 48%);
     backdrop-filter: blur(2px);
-    animation: tara-backdrop-in .2s ease-out both;
+    animation: sita-backdrop-in .2s ease-out both;
   }
 }
 
@@ -1304,7 +1304,7 @@ select:focus-visible {
     border-radius: 0;
     background: rgb(3 5 8 / 56%);
     backdrop-filter: blur(2px);
-    animation: tara-backdrop-in .2s ease-out both;
+    animation: sita-backdrop-in .2s ease-out both;
   }
 
   .app-shell.sidebar-open .sidebar {
@@ -1343,7 +1343,7 @@ select:focus-visible {
   }
 }
 
-@keyframes tara-backdrop-in {
+@keyframes sita-backdrop-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }

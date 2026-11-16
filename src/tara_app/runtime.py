@@ -1,4 +1,4 @@
-"""Load a trusted local runtime configuration and register TARA modules."""
+"""Load a trusted local runtime configuration and register SITA modules."""
 
 from __future__ import annotations
 
@@ -68,7 +68,7 @@ _OLLAMA_MODULE_ENV = {
 
 
 class RuntimeConfigurationError(ValueError):
-    """Raised when a local TARA-App configuration is incomplete or unsafe."""
+    """Raised when a local SITA configuration is incomplete or unsafe."""
 
 
 def create_application(config_path: str | Path) -> Orchestrator:
@@ -162,10 +162,10 @@ def create_application(config_path: str | Path) -> Orchestrator:
     for module_id in sorted(_REMOTE_MODULES - seen):
         registry.mark_disabled(
             module_id,
-            "The specialist is not configured in tara-app.toml. Add its [[modules]] entry from tara-app.example.toml.",
+            "The specialist is not configured in sita.toml. Add its [[modules]] entry from sita.example.toml.",
         )
 
-    # TARA no longer starts or calls Ollama for language-model inference.
+    # SITA no longer starts or calls Ollama for language-model inference.
     # Model selection and lifecycle belong to OmniRoute.
 
     try:

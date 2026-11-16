@@ -3,9 +3,9 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tara-app-core"
+name = "sita-core"
 version = "0.1.0"
-description = "TARA-App contracts, capability registry, and safe module orchestration"
+description = "SITA contracts, capability registry, and safe module orchestration"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
@@ -17,7 +17,8 @@ openai = ["openai>=1.68,<3"]
 mcp = ["mcp>=1.9,<2", "tzdata>=2025.1"]
 
 [project.scripts]
-tara-app = "tara_app.cli:main"
+sita = "tara_app.cli:main"
+sita-architecture = "tara_app.architecture_explorer:main"
 tara-architecture = "tara_app.architecture_explorer:main"
 
 [tool.setuptools.packages.find]

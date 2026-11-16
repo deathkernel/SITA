@@ -1,10 +1,10 @@
-# TARA Token-Efficient Intelligence Architecture
+# SITA Token-Efficient Intelligence Architecture
 
 **Status:** Proposed target architecture for staged implementation; not a claim that these optimizations already exist.
 
 ## 1. Objective
 
-Maximize useful work and answer quality per unit of paid inference usage. Minimize unnecessary input/output tokens, not necessary detail. TARA remains local-first and uses OmniRoute as its only language-model gateway. TARA owns intent routing, context assembly, memory, caching policy, local usage accounting, and permissions. OmniRoute owns provider/model lifecycle and provider-side routing.
+Maximize useful work and answer quality per unit of paid inference usage. Minimize unnecessary input/output tokens, not necessary detail. SITA remains local-first and uses OmniRoute as its only language-model gateway. SITA owns intent routing, context assembly, memory, caching policy, local usage accounting, and permissions. OmniRoute owns provider/model lifecycle and provider-side routing.
 
 Success means fewer repeated prompt/history tokens, fewer avoidable model calls, less irrelevant context, safe reuse, and measured savings without quality regression.
 
@@ -48,11 +48,11 @@ Create per-request budgets for system instructions, history/summary, memory, fil
 
 The planner must reserve output capacity first, prioritize the current request and safety instructions, trim low-relevance context before touching the current request, reject/request narrower scope if required context cannot fit, respect route context limits, and record estimated and actual usage separately.
 
-Do not hard-code tiny output limits to make metrics look good. Keep TARA-Chat's existing 1536-token default until task-based measurements justify a change.
+Do not hard-code tiny output limits to make metrics look good. Keep SITA Chat's existing 1536-token default until task-based measurements justify a change.
 
 ### 3.4 Inference and model-tier policy
 
-TARA keeps OmniRoute as its only inference gateway. TARA may select configured route aliases by task class but must not call provider APIs directly or silently fall back to Ollama/Gemini.
+SITA keeps OmniRoute as its only inference gateway. SITA may select configured route aliases by task class but must not call provider APIs directly or silently fall back to Ollama/Gemini.
 
 - Deterministic/local path for work that does not need inference.
 - Economical configured route for routine extraction, summaries, and straightforward questions.
@@ -118,7 +118,7 @@ Choose defaults from verified route capabilities and tests, not guesses. Invalid
 
 ## 7. Privacy and security
 
-Conversation history, summaries, memory, cache, and usage ledger remain under TARA's local data controls. Send only minimum required context through OmniRoute and preserve existing remote-transfer opt-in. Resolve session/workspace scope before retrieval or cache lookup. Model, cache, memory, file, and tool outputs remain untrusted. Cache never approves or executes actions. Apply redaction before persistence and remote inference where supported. Deletion/retention must include summaries, caches, embeddings, and usage records.
+Conversation history, summaries, memory, cache, and usage ledger remain under SITA's local data controls. Send only minimum required context through OmniRoute and preserve existing remote-transfer opt-in. Resolve session/workspace scope before retrieval or cache lookup. Model, cache, memory, file, and tool outputs remain untrusted. Cache never approves or executes actions. Apply redaction before persistence and remote inference where supported. Deletion/retention must include summaries, caches, embeddings, and usage records.
 
 ## 8. Implementation phases
 
