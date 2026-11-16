@@ -1334,3 +1334,354 @@ select:focus-visible {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* -------------------------------------------------------------------------- */
+/* SITA developer environment: graphite surfaces and restrained cyan accents  */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --bg: #0b0f14;
+  --sidebar: #0e131a;
+  --panel: #121922;
+  --panel-raised: #17212c;
+  --panel-soft: #1b2733;
+  --line: #202c38;
+  --line-strong: #304252;
+  --text: #e6edf3;
+  --muted: #9aa8b6;
+  --muted-2: #718096;
+  --accent: #69c7f4;
+  --accent-bright: #8bd8ff;
+  --accent-deep: #328dbb;
+  --accent-soft: #142d3c;
+  --green: #63d6a2;
+  --red: #ff7b72;
+  --yellow: #eac46a;
+  --panel-glass: rgb(18 25 34 / 94%);
+}
+
+html, body {
+  background: #0b0f14;
+  color: var(--text);
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 52% -28%, rgb(70 160 205 / 8%), transparent 48%),
+    #0b0f14;
+}
+
+.app-shell {
+  background: #0b0f14;
+}
+
+.sidebar {
+  background: linear-gradient(180deg, #101720 0%, #0d1219 100%);
+  border-right-color: #202c38;
+}
+
+.sidebar::after {
+  background: linear-gradient(180deg, transparent, rgb(105 199 244 / 18%), transparent);
+}
+
+.sidebar-brand strong,
+.topbar strong,
+.inspector-header strong {
+  color: #e6edf3;
+}
+
+.sidebar-brand div span,
+.section-heading,
+.inspector-kicker {
+  color: #78899a;
+}
+
+.new-session,
+.session-search,
+.sidebar-runtime,
+.inspector-card,
+.composer {
+  border-color: #263544;
+  background: #121a23;
+}
+
+.new-session:hover,
+.nav-item:hover,
+.conversation:hover {
+  border-color: #29465a;
+  background: #17232e;
+}
+
+.nav-item.selected,
+.conversation.active {
+  border-color: #28516a;
+  background: #142633;
+  color: #d8f1ff;
+}
+
+.nav-item.selected .nav-icon,
+.new-session > span,
+.text-button,
+.file-chip > span {
+  color: var(--accent);
+}
+
+.workspace {
+  background: #0c1117;
+}
+
+.topbar,
+.session-toolbar,
+.inspector-header,
+.inspector-tabs,
+.inspector-footer {
+  border-color: #202c38;
+}
+
+.topbar,
+.session-toolbar {
+  background: #0f151d;
+}
+
+.breadcrumb,
+.session-tab.active,
+.message-heading strong {
+  color: #dce6ef;
+}
+
+.session-state i,
+.mode-indicator i,
+.workspace-footer > span:first-child {
+  background: var(--green);
+}
+
+.mode-indicator {
+  color: #7f91a2;
+}
+
+.view-mode,
+.toolbar-button,
+.wide-secondary,
+.attach-button {
+  border-color: #2b3b4a;
+  background: #17212b;
+  color: #b8c7d5;
+}
+
+.toolbar-button:hover,
+.view-mode:hover,
+.wide-secondary:hover,
+.attach-button:hover {
+  border-color: #39799b;
+  color: #d9f2ff;
+}
+
+.welcome-eyebrow,
+.welcome-spark,
+.starter-icon,
+.inspector-tabs button.active,
+.health-pill.healthy,
+.specialist-icon,
+.integration-summary strong {
+  color: var(--accent);
+}
+
+.welcome h1 em {
+  color: #8bd8ff;
+}
+
+.starter-grid button {
+  border-color: #273747;
+  background: linear-gradient(145deg, #141e28, #101720);
+}
+
+.starter-grid button:hover {
+  border-color: #39799b;
+  background: #172633;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 22%), 0 0 0 1px rgb(105 199 244 / 9%);
+}
+
+.starter-grid button strong,
+.message-heading strong,
+.card-title > strong {
+  color: #dce6ef;
+}
+
+.message-body,
+.user-body,
+.composer textarea {
+  color: #d7e0e8;
+}
+
+.message-avatar {
+  border-color: #2c4253;
+  background: #142432;
+  color: #8bd8ff;
+}
+
+.message.user .message-avatar {
+  border-color: #33404d;
+  background: #1a232d;
+  color: #c4d0dc;
+}
+
+.composer {
+  background: #121a23;
+  box-shadow: 0 14px 38px rgb(0 0 0 / 28%);
+}
+
+.composer:focus-within {
+  border-color: #39799b;
+  box-shadow: 0 0 0 1px rgb(105 199 244 / 22%), 0 14px 38px rgb(0 0 0 / 32%);
+}
+
+.send-button {
+  border-color: #69c7f4;
+  background: #69c7f4;
+  color: #07131b;
+}
+
+.send-button:disabled {
+  border-color: #344b5a;
+  background: #263a48;
+  color: #8295a3;
+}
+
+.inspector {
+  background: #0f151d;
+  border-left-color: #202c38;
+}
+
+.inspector-tabs button.active {
+  border-bottom-color: var(--accent);
+}
+
+.inspector-card {
+  background: #131c26;
+}
+
+.runtime-detail,
+.specialist-row,
+.model-row,
+.integration-row {
+  border-color: #263544;
+}
+
+.health-pill,
+.integration-state {
+  border-color: #36566b;
+  color: #8bd8ff;
+}
+
+.health-pill.healthy,
+.integration-state.ready {
+  border-color: #285b49;
+  color: var(--green);
+}
+
+.terminal-preview {
+  border-color: #263b4b;
+  background: #080d12;
+  color: #8bd8ff;
+}
+
+.activity-panel {
+  border-color: #202c38;
+  background: #101820;
+}
+
+.activity-row {
+  border-color: #202c38;
+}
+
+.developer-statusbar {
+  display: flex;
+  min-height: 27px;
+  flex: 0 0 27px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 13px;
+  border-top: 1px solid #263544;
+  background: #101923;
+  color: #8fa2b4;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .01em;
+}
+
+.statusbar-group {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+}
+
+.statusbar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.statusbar-item > i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #eac46a;
+}
+
+.statusbar-item.is-good > i {
+  background: #63d6a2;
+  box-shadow: 0 0 7px rgb(99 214 162 / 35%);
+}
+
+.statusbar-item.is-warn > i {
+  background: #eac46a;
+}
+
+.statusbar-item > b {
+  color: #69c7f4;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.statusbar-right {
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.statusbar-mode {
+  color: #9fb1c1;
+}
+
+.statusbar-lock {
+  color: #eac46a;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+@media (max-width: 700px) {
+  .developer-statusbar {
+    min-height: 25px;
+    flex-basis: 25px;
+    padding: 0 8px;
+    font-size: 8px;
+  }
+
+  .statusbar-group {
+    gap: 8px;
+  }
+
+  .statusbar-item:nth-child(2),
+  .statusbar-item:nth-child(3),
+  .statusbar-mode {
+    display: none;
+  }
+
+  .statusbar-lock {
+    font-size: 7px;
+  }
+}
+
