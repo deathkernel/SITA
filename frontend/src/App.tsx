@@ -346,7 +346,7 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = (active.title || "tara-session")
+    anchor.download = (active.title || "sita-session")
       .replace(/[^a-z0-9-_]+/gi, "-")
       .replace(/^-|-$/g, "")
       .slice(0, 48) + ".json";
@@ -712,7 +712,7 @@ export default function App() {
             <div><strong>OmniRoute</strong><span>{statusLabel(gatewayStatus)}</span></div>
             <button type="button" onClick={() => void refreshWorkspace()} aria-label="Refresh workspace status">↻</button>
           </div>
-          <div className="profile-row"><span className="profile-avatar">T</span><div><strong>SITA Local</strong><span>Personal workspace</span></div><span className="profile-menu">•••</span></div>
+          <div className="profile-row"><span className="profile-avatar">S</span><div><strong>SITA Local</strong><span>Personal workspace</span></div><span className="profile-menu">•••</span></div>
         </div>
       </aside>
       {mobileSidebarOpen && (
@@ -923,7 +923,7 @@ export default function App() {
               </section>
               <section className="inspector-card terminal-locked">
                 <div className="card-title"><strong>Terminal</strong><span className="health-pill locked">Locked</span></div>
-                <div className="terminal-preview"><span>tara@local:~$</span> <i>command execution unavailable</i></div>
+                <div className="terminal-preview"><span>sita@local:~$</span> <i>command execution unavailable</i></div>
                 <p>Terminal execution stays disabled until an OS-level sandbox and isolation tests are in place.</p>
               </section>
             </div>

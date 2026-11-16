@@ -1,12 +1,12 @@
-# TARA Wide System Architecture
+# SITA Wide System Architecture
 
 **Status:** Proposed target architecture — design only, not yet implemented  
-**Scope:** TARA-App consolidated repository  
+**Scope:** SITA consolidated repository  
 **Architecture style:** Responsibility-oriented modular monolith, workflow-coordinated, ports-and-adapters at external boundaries
 
 ## 1. Objective
 
-TARA must behave as one connected Windows application, not as a collection of isolated AI packages. The repository is organized around the lifecycle and responsibilities of the whole system. Models, providers, and user-facing capabilities are implementation details behind stable interfaces; they do not define the top-level folder structure.
+SITA must behave as one connected Windows application, not as a collection of isolated AI packages. The repository is organized around the lifecycle and responsibilities of the whole system. Models, providers, and user-facing capabilities are implementation details behind stable interfaces; they do not define the top-level folder structure.
 
 The target is intentionally a **modular monolith**:
 - one application composition root and one authoritative request lifecycle;
@@ -24,7 +24,7 @@ The target is intentionally a **modular monolith**:
 5. **Dependency inversion.** Core rules depend on ports/contracts, not HTTP servers, SQLite, OmniRoute, Windows APIs, or subprocess implementations.
 6. **Policy before execution.** Authorization and approval are enforced at the execution boundary, not merely in the UI or router.
 7. **Fail closed.** Missing dependencies, invalid contracts, audit failure before a protected action, unsupported versions, or missing approval prevent execution.
-8. **Local-first control plane.** Sessions, workflow state, permissions, approvals, and audit remain under TARA's control. Inference may use the configured OmniRoute route and its selected provider.
+8. **Local-first control plane.** Sessions, workflow state, permissions, approvals, and audit remain under SITA's control. Inference may use the configured OmniRoute route and its selected provider.
 9. **No model ownership in feature logic.** Application operations request inference through a common gateway port. They do not load weights, select providers, or manage provider lifecycle.
 10. **Evidence-based migration.** Existing behavior is mapped and tested before moving or removing code.
 
@@ -33,7 +33,7 @@ The target is intentionally a **modular monolith**:
 ~~~mermaid
 flowchart TB
     USER[User]
-    subgraph TARA["TARA Windows Application"]
+    subgraph SITA["SITA Windows Application"]
       UI[Interaction Interfaces]
       APP[Application Services]
       WF[Workflow and Coordination]
@@ -307,7 +307,7 @@ Define migrations, retention, backup, corruption recovery, and file-permission p
 
 ## 10. AI and external execution boundary
 
-TARA owns workflow planning, permissions, context selection, local state, tool dispatch, and result validation. OmniRoute remains the configured inference gateway and owns model/provider routing. Inference is a port implemented under infrastructure/inference/.
+SITA owns workflow planning, permissions, context selection, local state, tool dispatch, and result validation. OmniRoute remains the configured inference gateway and owns model/provider routing. Inference is a port implemented under infrastructure/inference/.
 
 Consequences:
 - no model-specific source folders;

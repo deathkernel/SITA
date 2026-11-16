@@ -168,7 +168,7 @@ def execute(action: str, inputs: dict[str, Any], *, approval_token: str | None =
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
             "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "TARA-Action/0.1",
+            "User-Agent": "SITA-Action/0.1",
         },
         method="POST",
     )

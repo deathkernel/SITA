@@ -7,7 +7,7 @@ git grep -n -I -E "^(<<<<<<<|=======|>>>>>>>)" -- pyproject.toml src tests >nul 
 if not errorlevel 1 (
   echo ERROR: Unresolved Git conflict markers were found in tracked project files.
   git grep -n -I -E "^(<<<<<<<|=======|>>>>>>>)" -- pyproject.toml src tests
-  echo Resolve every conflict, save the files, and run run-tara.bat again.
+  echo Resolve every conflict, save the files, and run run-sita.bat again.
   exit /b 1
 )
 if errorlevel 2 (
@@ -63,8 +63,8 @@ if exist "frontend\package.json" (
 )
 
 if not exist "sita.toml" (
-  if exist "tara-app.toml" (
-    copy "tara-app.toml" "sita.toml" >nul
+  if exist "sita.toml" (
+    copy "sita.toml" "sita.toml" >nul
   ) else (
     copy "sita.example.toml" "sita.toml" >nul
   )
@@ -73,5 +73,5 @@ if not exist "sita.toml" (
 ".venv\Scripts\python.exe" -m tara_app.handler_launcher prepare
 
 ".venv\Scripts\python.exe" -m tara_app --config "sita.toml"
-set "TARA_EXIT_CODE=%errorlevel%"
-endlocal & exit /b %TARA_EXIT_CODE%
+set "SITA_EXIT_CODE=%errorlevel%"
+endlocal & exit /b %SITA_EXIT_CODE%

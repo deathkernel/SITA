@@ -53,8 +53,8 @@
     const suffix = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
     return AUDIO_SUFFIX_TYPES[suffix] || null;
   };
-  const sessionKey = "sita-session";
-  const conversationStorageKey = "sita-conversations";
+  const sessionKey = "tara-app-session";
+  const conversationStorageKey = "tara-app-conversations";
   const conversationList = document.querySelector("#conversation-list");
   let conversations = [];
   try {

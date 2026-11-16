@@ -20,6 +20,8 @@ def main() -> int:
         help="show the native Windows floating pet instead of the browser interface",
     )
     args = parser.parse_args()
+    if args.config == Path("sita.toml") and not args.config.exists() and Path("tara-app.toml").is_file():
+        args.config = Path("tara-app.toml")
     app = None
     try:
         if args.floating_pet and sys.platform != "win32":

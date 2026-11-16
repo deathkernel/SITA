@@ -1,9 +1,9 @@
-# TARA-App: Project History, Current Status & Roadmap
+# SITA: Project History, Current Status & Roadmap
 
-> **Purpose:** This is the handover document and working source of truth for anyone joining TARA-App—including a new developer, a reviewer, or the daily scheduled development task.
+> **Purpose:** This is the handover document and working source of truth for anyone joining SITA—including a new developer, a reviewer, or the daily scheduled development task.
 >
 > **Last reviewed:** 2026-11-12  
-> **Repository:** [deathkernel/TARA-App](https://github.com/deathkernel/TARA-App)  
+> **Repository:** [deathkernel/SITA](https://github.com/deathkernel/TARA-App)  
 > **Default branch:** `main`  
 > **Status rule:** “Implemented in code/docs” is not the same as “verified on a real machine.” Do not claim tests, runtime checks, UI QA, or integrations passed unless there is current evidence for the exact commit.
 >
@@ -93,15 +93,15 @@ performance and screen-reader behavior still require browser validation.
 
 ### Repository boundary
 
-`deathkernel/TARA-App` is the only active development repository for TARA. The user has deleted the other TARA model repositories. All remaining specialist/model integrations, adapters, runtime code, tests, and documentation must be implemented and maintained inside this repository. Do not plan work that requires cloning, importing, or coordinating with deleted sibling repositories. Any legacy references to sibling repositories are historical/contextual only unless the user explicitly restores one.
+`deathkernel/SITA` is the only active development repository for SITA. The user has deleted the other SITA model repositories. All remaining specialist/model integrations, adapters, runtime code, tests, and documentation must be implemented and maintained inside this repository. Do not plan work that requires cloning, importing, or coordinating with deleted sibling repositories. Any legacy references to sibling repositories are historical/contextual only unless the user explicitly restores one.
 
-TARA-App is the **user-facing host application and integration layer** for the TARA ecosystem. It is not itself an AI model. Its job is to provide one interface for chatting, using specialist capabilities, reviewing proposed code changes, and managing approved local actions. OmniRoute is the only language-model gateway; it owns underlying provider/model selection.
+SITA is the **user-facing host application and integration layer** for the SITA ecosystem. It is not itself an AI model. Its job is to provide one interface for chatting, using specialist capabilities, reviewing proposed code changes, and managing approved local actions. OmniRoute is the only language-model gateway; it owns underlying provider/model selection.
 
 The intended design keeps these concepts separate:
 
-- **App:** TARA-App, the UI, settings, sessions, and orchestration.
+- **App:** SITA, the UI, settings, sessions, and orchestration.
 - **Model:** model weights or a remotely hosted model, with its own identity and version.
-- **Gateway/provider:** OmniRoute exposes an OpenAI-compatible API and routes requests to configured model providers. TARA does not directly invoke Ollama or Gemini for language-model inference.
+- **Gateway/provider:** OmniRoute exposes an OpenAI-compatible API and routes requests to configured model providers. SITA does not directly invoke Ollama or Gemini for language-model inference.
 - **Specialist/module:** a task-specific capability such as Chat, Code, Research, Study, Vision, or Handler.
 - **Tool/action:** a bounded operation a specialist may request; it is not automatically authorized just because a model requested it.
 
@@ -133,7 +133,7 @@ For the numbered remaining-features inventory (items 1–42), use [REMAINING_FEA
 
 | Area | Current documented scope | Important limit / verification gap |
 |---|---|---|
-| App and launchers | Python app; Windows `run-tara.bat`; Linux `run-tara.sh`; local configuration from `tara-app.example.toml` | Windows/macOS/Linux launchers are documented; fresh installation and launch still need target-machine smoke tests on each supported target. |
+| App and launchers | Python app; Windows `run-tara.bat`; Linux `run-tara.sh`; local configuration from `sita.example.toml` | Windows/macOS/Linux launchers are documented; fresh installation and launch still need target-machine smoke tests on each supported target. |
 | Chat UI | Markdown replies, safe link handling, copy, edit/resend, regenerate, conversation context | Attached-file prompts have editing/regeneration limitations; browser visual QA is not established by docs alone |
 | Router and specialists | Local deterministic Router; Chat, Code, Planner, Creative, Security, Action, Memory, Research, Data, Vision, Voice, Study, Weather and Models areas are documented | Confirm each route and dependency against current code/tests; do not infer all are production-ready from the module list |
 | LLM inference | Chat, Code, Vision, Creative, and Model Hub are routed through OmniRoute; direct Ollama/Gemini fallback is disabled in the launcher runtime | Gateway connectivity, provider routing, quotas, model IDs, and first responses need end-to-end verification |
@@ -173,7 +173,7 @@ This is a concise history of significant milestones visible in the repository's 
 | PR #24 — structured answers and monochrome chat UI | Improved structured responses and chat styling | UI changes need regression and browser verification |
 | PR #25 — chat workspace redesign | Redesigned sidebar, conversation area, welcome state, messages, composer and responsive CSS | CSS redesign is merged; visual/browser QA and any remaining parity work are still to be evidenced |
 | [PR #26 — living project roadmap](https://github.com/deathkernel/TARA-App/pull/26) | Added newcomer-friendly history, dependency-ordered roadmap, and scheduled-task evidence rules | Merged as `4d4c225aeba422cd30dfc272ca67d32bba942129` |
-| [PR #27 — structured TARA answers](https://github.com/deathkernel/TARA-App/pull/27) | Added task-adaptive response guidance and focused answer-style tests; fixed a syntax error found by CI before merge | PR CI passed on head `dd2f87295c6be934f867e96b4976dc592c575447`; merged as `c8b484c977ca31ac4f8396bd20c090fe580299ea` |
+| [PR #27 — structured SITA answers](https://github.com/deathkernel/TARA-App/pull/27) | Added task-adaptive response guidance and focused answer-style tests; fixed a syntax error found by CI before merge | PR CI passed on head `dd2f87295c6be934f867e96b4976dc592c575447`; merged as `c8b484c977ca31ac4f8396bd20c090fe580299ea` |
 | [PR #34 — drop floating pet](https://github.com/deathkernel/TARA-App/pull/34) | Restored the normal browser UI as the default Windows launcher and documented that the floating pet is no longer a product goal | Merged as `1bf4fdff00d748acecbba4e50cda7483f82b9f4f`; all 5 GitHub Actions jobs passed on PR head `0eff1fa8b0e1d4c99f964ccdc08ad600eb153c82` |
 | [PR #50 — native command risk](https://github.com/deathkernel/TARA-App/pull/50) | Mutating native commands stay high-risk even with `-v` / `--version` flags | Merged 2026-11-03 |
 | [PR #51 — session lifecycle](https://github.com/deathkernel/TARA-App/pull/51) | Atomic chat turns + opt-in session retention | Merged; on `main` as of `c45f4c3` |
@@ -218,9 +218,9 @@ This roadmap is dependency-ordered. The daily development task should deliver a 
 ### P1 — Finish the application integration path
 
 - [ ] Connect the headless application service to a stable local UI/API entry point.
-- [ ] Bind the actual TARA-Chat engine through the versioned Chat adapter and verify a real end-to-end chat request.
-- [ ] Bind TARA-Code planning/review through its adapter; keep proposed changes as data until a secure patch-review workflow exists.
-- [ ] Specify and implement the narrow TARA-Handler subprocess protocol with fixed arguments, `shell=False`, timeouts, bounded output and an explicit command allowlist.
+- [ ] Bind the actual SITA Chat engine through the versioned Chat adapter and verify a real end-to-end chat request.
+- [ ] Bind SITA Code planning/review through its adapter; keep proposed changes as data until a secure patch-review workflow exists.
+- [ ] Specify and implement the narrow SITA Handler subprocess protocol with fixed arguments, `shell=False`, timeouts, bounded output and an explicit command allowlist.
 - [ ] Add request cancellation, timeouts, bounded execution and graceful shutdown for injected engines and provider calls.
 - [ ] Verify runtime lifecycle behavior: health checks, load/unload, missing model/provider, download failure, resource limits, concurrent requests and recovery.
 - [x] Finish session persistence policy: define retention/deletion defaults, migration strategy, and app-level configuration wiring. **Code:** opt-in SQLite, atomic turns, retention (PR #51). Default remains memory-only; target-machine verification still open.
@@ -289,8 +289,8 @@ For each daily run:
 - [Application service and adapters](APP_SERVICE_AND_ADAPTERS.md)
 - [Integration contracts](INTEGRATION_CONTRACTS.md)
 - [Security policy](SECURITY.md)
-- [TARA Code adapter](TARA_CODE_ADAPTER.md)
-- [TARA Code adapter test matrix](TARA_CODE_ADAPTER_TEST_MATRIX.md)
+- [SITA Code adapter](TARA_CODE_ADAPTER.md)
+- [SITA Code adapter test matrix](TARA_CODE_ADAPTER_TEST_MATRIX.md)
 - [AI/tool ecosystem inventory](TARA_AI_TOOL_ECOSYSTEM.md)
 - [Native Handler integration](native-handler.md)
 - [Runtime and development option notes](runtime-evaluation.md)
