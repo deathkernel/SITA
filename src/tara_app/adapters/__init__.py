@@ -1,4 +1,4 @@
-"""Protocols shared by the SITA-App runtime and specialist adapters."""
+"""Protocols shared by the SITA runtime and specialist adapters."""
 from __future__ import annotations
 
 from typing import Any, Mapping, Protocol, Sequence

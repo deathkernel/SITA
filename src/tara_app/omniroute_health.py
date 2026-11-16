@@ -21,7 +21,7 @@ def diagnose_gateway(base_url: str, api_key: str, *, timeout: float = 5.0) -> st
         headers={
             "Authorization": f"Bearer {api_key}",
             "Accept": "application/json",
-            "User-Agent": "SITA-App/0.1",
+            "User-Agent": "SITA/0.1",
         },
         method="GET",
     )
