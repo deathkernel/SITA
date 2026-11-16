@@ -1,4 +1,4 @@
-"""Static source-code architecture extraction for TARA repositories.
+"""Static source-code architecture extraction for SITA repositories.
 
 The explorer is intentionally offline and read-only. It never imports or executes
 project code; it parses Python with the standard-library AST and uses bounded,
@@ -294,10 +294,10 @@ def to_mermaid(graph: dict[str, object]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     """Parse CLI arguments, scan a repository, and write graph outputs."""
-    parser = argparse.ArgumentParser(prog="tara-architecture", description="Extract a source-code architecture graph without executing project code")
+    parser = argparse.ArgumentParser(prog="sita-architecture", description="Extract a source-code architecture graph without executing project code")
     parser.add_argument("root", nargs="?", type=Path, default=Path.cwd(), help="repository root to scan")
-    parser.add_argument("--json", dest="json_path", type=Path, default=Path("tara-architecture.json"), help="JSON graph output path")
-    parser.add_argument("--mermaid", type=Path, default=Path("tara-architecture.mmd"), help="Mermaid graph output path")
+    parser.add_argument("--json", dest="json_path", type=Path, default=Path("sita-architecture.json"), help="JSON graph output path")
+    parser.add_argument("--mermaid", type=Path, default=Path("sita-architecture.mmd"), help="Mermaid graph output path")
     parser.add_argument("--max-files", type=int, default=MAX_FILES, help="maximum source files to inspect")
     args = parser.parse_args(argv)
 
