@@ -29,11 +29,13 @@ echo.
 echo   +------------------------------------------------------------------------+
 echo   ^| %DIM%Welcome to%RESET% %CYAN%SITA%RESET%                                                           ^|
 echo   ^|                                                                        ^|
-echo   ^|   %GOLD%SSSS   III  TTTTT  AAAAA%RESET%                                             ^|
-echo   ^|  %GOLD%S      III    T   A     A%RESET%                                            ^|
-echo   ^|   %GOLD%SSS   III    T   AAAAAAA%RESET%                                            ^|
-echo   ^|      %GOLD%S  III    T   A     A%RESET%                                            ^|
-echo   ^|  %GOLD%SSSS   III    T   A     A%RESET%                                            ^|
+echo   ^|         %GOLD%##########    ##########    ##########      ######  %RESET%                   ^|
+echo   ^|         %GOLD%##                ##            ##        ##      ##%RESET%                   ^|
+echo   ^|         %GOLD%##                ##            ##        ##      ##%RESET%                   ^|
+echo   ^|         %GOLD%##########        ##            ##        ##########%RESET%                   ^|
+echo   ^|         %GOLD%        ##        ##            ##        ##      ##%RESET%                   ^|
+echo   ^|         %GOLD%        ##        ##            ##        ##      ##%RESET%                   ^|
+echo   ^|         %GOLD%##########    ##########        ##        ##      ##%RESET%                   ^|
 echo   ^|                                                                        ^|
 echo   ^|                         %CYAN%LOCAL AI WORKSPACE%RESET%                             ^|
 echo   ^|   %DIM%Private by design. Local-first by default.%RESET%                            ^|
