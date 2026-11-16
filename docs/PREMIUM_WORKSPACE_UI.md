@@ -19,6 +19,8 @@ Reference: [Claude's April 14, 2026 desktop redesign](https://claude.com/blog/cl
 - **Right inspector:** live specialist/gateway health, OmniRoute model routes,
   and the read-only MCP integration catalogue.
 - **Activity panel:** local request lifecycle events and status messages.
+- **Developer status bar:** live gateway, specialist, model-route, workspace,
+  review-mode, and execution-lock indicators sourced from current UI state.
 - **Terminal state:** displayed as locked. It is not a terminal emulator and
   does not accept or execute commands.
 
@@ -29,11 +31,13 @@ search, and `Escape` to close responsive drawers and the inspector.
 
 ## Visual system and interaction design
 
-The visual language is a restrained graphite workspace with warm champagne
-accents, cool slate surfaces, fine borders, and high-contrast text. It avoids
-neon gradients and decorative dashboard clutter. The interface uses the local
-system font stack and ships no remote font, icon, animation, or analytics
-dependency.
+The visual language is a restrained graphite developer environment with
+cool cyan accents, slate surfaces, fine borders, and high-contrast text. A
+compact status bar exposes live gateway health, specialist count, model-route
+count, local-workspace state, review-first mode, and the execution lock. It
+avoids neon gradients and decorative dashboard clutter. The interface uses
+the local system font stack and ships no remote font, icon, animation, or
+analytics dependency.
 
 ### Motion principles
 
