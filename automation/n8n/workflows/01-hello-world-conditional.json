@@ -1,0 +1,202 @@
+{
+  "name": "TARA - Hello World Conditional Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1001",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1002",
+              "name": "message",
+              "value": "Hello World! My first n8n workflow.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1003",
+      "name": "Create Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const message = $input.first().json.message;\n\nreturn [\n  {\n    json: {\n      original_message: message,\n      modified_message: message.toUpperCase(),\n      status: \"Success\"\n    }\n  }\n];"
+      },
+      "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1004",
+      "name": "Process Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1005",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "Success",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1006",
+      "name": "Check Status",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1007",
+              "name": "result",
+              "value": "Workflow completed successfully!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1008",
+      "name": "Success Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1140,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1009",
+              "name": "result",
+              "value": "Workflow failed! Please check the error.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1010",
+      "name": "Failure Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1140,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Message": {
+      "main": [
+        [
+          {
+            "node": "Process Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Message": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status": {
+      "main": [
+        [
+          {
+            "node": "Success Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Failure Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-11-16T00:00:00.000Z",
+  "versionId": "6d0b0e31-8a8d-4c3f-8d62-4bfb2a2a1099",
+  "active": false
+}
