@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
@@ -261,7 +262,12 @@ def serve(app: ApplicationFacade, *, port: int = 8765) -> None:
         raise ValueError("port must be between 1024 and 65535")
     server = _Server(("127.0.0.1", port), app)
     try:
-        print(f"SITA is ready at http://127.0.0.1:{port}")
+        address = f"http://127.0.0.1:{port}"
+        if sys.stdout.isatty():
+            print(f"\033[92m  [ READY ]\033[0m SITA is running at \033[96m{address}\033[0m")
+            print("\033[90m  Press Ctrl+C to stop the local server.\033[0m")
+        else:
+            print(f"SITA is ready at {address}")
         server.serve_forever()
     except KeyboardInterrupt:
         print("\nSITA stopped")
