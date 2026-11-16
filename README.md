@@ -173,7 +173,7 @@ SITA now includes the local Router, Chat, Code, Planner, Memory, Creative, Secur
 1. Install Python 3.11 or newer and configure a running OmniRoute gateway.
 2. Clone this repository.
 3. Set `$env:TARA_OMNIROUTE_API_KEY = Read-Host 'OmniRoute API key'` in PowerShell.
-4. Run `.\run-tara.bat` in that same PowerShell window.
+4. Run `.\run-sita.bat` in that same PowerShell window.
 
 The launcher creates a local virtual environment, installs this repository, creates `sita.toml` from the example when needed, prepares the optional native Handler diagnostic, and starts SITA. SITA does not install, start, or call Ollama for language-model inference; the configured OmniRoute gateway handles model routing.
 
@@ -183,7 +183,7 @@ The launcher creates a local virtual environment, installs this repository, crea
 1. Install Python 3.11 or newer and configure a running OmniRoute gateway.
 2. Clone this repository.
 3. Export `TARA_OMNIROUTE_API_KEY` in the shell environment.
-4. Run `./run-tara.sh` from the repository folder.
+4. Run `./run-sita.sh` from the repository folder.
 
 The script creates a virtual environment, installs SITA, initializes the local config, explicitly prepares the optional native Handler diagnostic, and starts the app. If a local CMake/C++ toolchain is missing, Handler keeps working through the read-only Python fallback. All language-model requests still go through OmniRoute.
 
@@ -202,7 +202,7 @@ On Windows PowerShell, use `Copy-Item sita.example.toml sita.toml` in place of `
 
 ### Python 3.15 and Voice transcription
 
-If installation previously stopped with `No matching distributions found for onnxruntime`, pull the latest `main` branch and rerun `run-tara.bat`. The core app no longer requires faster-whisper. The launcher skips its Voice transcription dependency on Python 3.15 or newer (and continues if optional Voice installation fails); Chat, Code, Vision, and other app features can still run. Local audio transcription needs a Python version with compatible faster-whisper/onnxruntime packages. Browser read-aloud remains available locally.
+If installation previously stopped with `No matching distributions found for onnxruntime`, pull the latest `main` branch and rerun `run-sita.bat`. The core app no longer requires faster-whisper. The launcher skips its Voice transcription dependency on Python 3.15 or newer (and continues if optional Voice installation fails); Chat, Code, Vision, and other app features can still run. Local audio transcription needs a Python version with compatible faster-whisper/onnxruntime packages. Browser read-aloud remains available locally.
 
 ### Consolidation status
 
@@ -484,8 +484,8 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-  Platform{Operating system} -->|Windows| BAT[run-tara.bat]
-  Platform -->|macOS / Linux| SH[run-tara.sh]
+  Platform{Operating system} -->|Windows| BAT[run-sita.bat]
+  Platform -->|macOS / Linux| SH[run-sita.sh]
   BAT --> VENV[Prepare virtual environment and install]
   SH --> VENV
   VENV --> Config[Initialize local configuration]

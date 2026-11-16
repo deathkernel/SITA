@@ -133,7 +133,7 @@ For the numbered remaining-features inventory (items 1–42), use [REMAINING_FEA
 
 | Area | Current documented scope | Important limit / verification gap |
 |---|---|---|
-| App and launchers | Python app; Windows `run-tara.bat`; Linux `run-tara.sh`; local configuration from `sita.example.toml` | Windows/macOS/Linux launchers are documented; fresh installation and launch still need target-machine smoke tests on each supported target. |
+| App and launchers | Python app; Windows `run-sita.bat`; Linux `run-sita.sh`; local configuration from `sita.example.toml` | Windows/macOS/Linux launchers are documented; fresh installation and launch still need target-machine smoke tests on each supported target. |
 | Chat UI | Markdown replies, safe link handling, copy, edit/resend, regenerate, conversation context | Attached-file prompts have editing/regeneration limitations; browser visual QA is not established by docs alone |
 | Router and specialists | Local deterministic Router; Chat, Code, Planner, Creative, Security, Action, Memory, Research, Data, Vision, Voice, Study, Weather and Models areas are documented | Confirm each route and dependency against current code/tests; do not infer all are production-ready from the module list |
 | LLM inference | Chat, Code, Vision, Creative, and Model Hub are routed through OmniRoute; direct Ollama/Gemini fallback is disabled in the launcher runtime | Gateway connectivity, provider routing, quotas, model IDs, and first responses need end-to-end verification |
