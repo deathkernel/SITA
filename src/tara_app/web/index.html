@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark light">
+    <meta name="description" content="SITA — a local-first AI workspace for chat, code, research and specialist workflows.">
+    <meta name="application-name" content="SITA">
+    <meta name="theme-color" content="#171717">
+    <link rel="icon" type="image/svg+xml" href="/sita-mark.svg">
+    <link rel="manifest" href="/site.webmanifest">
     <title>SITA</title>
     <link rel="stylesheet" href="/app.css">
     <script src="/app.js" defer></script>
@@ -11,7 +16,7 @@
   <body>
     <div class="app-layout">
       <aside class="sidebar" aria-label="Conversation history">
-        <div class="sidebar-brand"><span class="sidebar-mark" aria-hidden="true">S</span><span>SITA</span></div>
+        <div class="sidebar-brand"><img class="sidebar-mark" src="/sita-mark.svg" alt="" aria-hidden="true"><span>SITA</span></div>
         <button id="new-chat" class="new-chat-button" type="button">+ <span>New chat</span></button>
         <p class="history-label">Recent chats</p>
         <nav id="conversation-list" class="conversation-list" aria-label="Recent chats"></nav>
@@ -19,7 +24,7 @@
       </aside>
       <main class="shell">
       <header class="topbar">
-        <div class="brand-mark" aria-hidden="true">T</div>
+        <img class="brand-mark" src="/sita-mark.svg" alt="" aria-hidden="true">
         <div>
           <h1>SITA</h1>
           <p>Your assistant, routed to the right specialist</p>

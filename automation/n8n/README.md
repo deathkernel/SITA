@@ -1,11 +1,11 @@
-# TARA n8n Automation Library
+# SITA n8n Automation Library
 
-This directory stores **importable n8n workflow JSON files** for local automation experiments alongside TARA-App.
+This directory stores **importable n8n workflow JSON files** for local automation experiments alongside SITA.
 
 ## Boundary and safety
 
-- n8n is a separate local workflow engine; these files do not add n8n as a runtime dependency of TARA-App.
-- Existing TARA application code and behavior are unchanged by this starter pack.
+- n8n is a separate local workflow engine; these files do not add n8n as a runtime dependency of SITA.
+- Existing SITA application code and behavior are unchanged by this starter pack.
 - Workflows are imported into the user's own n8n instance and remain inactive until explicitly activated.
 - Credentials, API keys, passwords, and personal data must be configured inside n8n Credentials or local environment variables. Never commit secrets in workflow JSON.
 - Review every workflow and its external connections before activation. A workflow can call external services and may transmit data.

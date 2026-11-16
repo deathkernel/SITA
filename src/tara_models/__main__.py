@@ -39,7 +39,7 @@ def _omniroute_config() -> tuple[str, str, str]:
         or parsed.query or parsed.fragment
         or (port is not None and not 1 <= port <= 65535)
     ):
-        raise ValueError("TARA Model Hub only accepts the local OmniRoute /v1 endpoint")
+        raise ValueError("SITA Model Hub only accepts the local OmniRoute /v1 endpoint")
     key = os.environ.get("TARA_MODELS_API_KEY", os.environ.get("TARA_OMNIROUTE_API_KEY", "")).strip()
     if not key or len(key) > 4096 or any(ord(char) < 33 or ord(char) == 127 for char in key):
         raise ValueError("OmniRoute API key is missing or invalid")
@@ -58,7 +58,7 @@ def _http_json(url: str, *, api_key: str, method: str = "GET", body: dict[str, A
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "TARA-App/0.1",
+            "User-Agent": "SITA/0.1",
         },
         method=method,
     )
@@ -110,7 +110,7 @@ def _generate(base: str, key: str, model: str, question: str) -> tuple[str, str]
             "model": model,
             "stream": False,
             "messages": [
-                {"role": "system", "content": "You are TARA, a helpful assistant. Answer clearly and directly. State uncertainty and never invent sources."},
+                {"role": "system", "content": "You are SITA, a helpful assistant. Answer clearly and directly. State uncertainty and never invent sources."},
                 {"role": "user", "content": question},
             ],
             "max_tokens": 4096,

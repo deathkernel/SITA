@@ -21,7 +21,7 @@ def _result(request_id: str, status: str, data: dict[str, Any] | None = None, er
 
 def _get_json(host: str, path: str, query: dict[str, str]) -> Any:
     url = "https://" + host + path + "?" + urlencode(query)
-    request = Request(url, headers={"Accept": "application/json", "User-Agent": "TARA-App/0.1 (https://github.com/deathkernel/TARA-App)"})
+    request = Request(url, headers={"Accept": "application/json", "User-Agent": "SITA/0.1 (https://github.com/deathkernel/TARA-App)"})
     with build_opener(ProxyHandler({})).open(request, timeout=10) as response:
         if response.geturl().split("/", 3)[:3] != ["https:", "", host]:
             raise ValueError("public research endpoint redirected unexpectedly")
@@ -95,7 +95,7 @@ def handle_request(request: Any) -> dict[str, Any]:
     if action == "health":
         return _result(request_id, "success", {"healthy": True, "providers": ["Crossref", "Wikipedia"]})
     if action != "answer" or not isinstance(inputs, Mapping):
-        return _result(request_id, "permission_denied", error="unsupported TARA-Research capability")
+        return _result(request_id, "permission_denied", error="unsupported SITA-Research capability")
     question = inputs.get("question")
     if not isinstance(question, str) or not question.strip() or len(question) > 1000:
         return _result(request_id, "invalid_request", error="research query must be non-empty and at most 1000 characters")

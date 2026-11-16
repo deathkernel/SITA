@@ -67,7 +67,7 @@ def _http_json(url: str, payload: dict[str, Any], timeout: float) -> dict[str, A
 
 
 class OllamaProvider:
-    """TARA-compatible local LLM provider backed by an Ollama server."""
+    """SITA-compatible local LLM provider backed by an Ollama server."""
 
     def __init__(
         self,
@@ -139,7 +139,7 @@ class OllamaProvider:
 
     @classmethod
     def from_env(cls) -> "OllamaProvider":
-        """Build a provider from TARA/Ollama environment settings."""
+        """Build a provider from SITA/Ollama environment settings."""
         raw_timeout = os.getenv("TARA_LLM_TIMEOUT_SECONDS", "120").strip()
         try:
             timeout = float(raw_timeout)

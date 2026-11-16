@@ -1,7 +1,7 @@
 # Batch 21 — Guardrails and MCP integrations
 
 ## Scope
-Evaluate `openai/openai-guardrails-python`, `openai/openai-guardrails-js`, and `openai/mcp-extensions` as optional integrations. Existing TARA Security remains authoritative; external guardrails provide signals, not an automatic policy override.
+Evaluate `openai/openai-guardrails-python`, `openai/openai-guardrails-js`, and `openai/mcp-extensions` as optional integrations. Existing SITA Security remains authoritative; external guardrails provide signals, not an automatic policy override.
 
 ## Security model
 - MCP tools are disabled until individually reviewed and allowlisted.

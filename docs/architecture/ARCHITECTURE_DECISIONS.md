@@ -1,10 +1,10 @@
-# TARA Architecture Decision Records
+# SITA Architecture Decision Records
 
 **Status:** Proposed decisions for architecture review
 
 ## ADR-001 — Use a responsibility-oriented modular monolith
 
-**Decision:** Keep one deployable TARA application with explicit internal boundaries.  
+**Decision:** Keep one deployable SITA application with explicit internal boundaries.  
 **Reason:** The current desktop product benefits from simple local deployment and direct calls, while still needing clear ownership and testable boundaries.  
 **Consequences:** No distributed message broker or microservice fleet in the initial redesign. Separate processes are used only for native components or a justified isolation boundary.
 
@@ -41,7 +41,7 @@
 ## ADR-007 — Keep inference behind one gateway port
 
 **Decision:** Application/workflow code calls an inference port; the production adapter uses the configured OmniRoute gateway.  
-**Reason:** TARA should not couple its architecture to model families, weight formats or provider lifecycle.  
+**Reason:** SITA should not couple its architecture to model families, weight formats or provider lifecycle.  
 **Consequences:** No direct provider client in domain or use-case code. No silent local/cloud fallback. Model catalogue and route selection are not top-level architectural concerns.
 
 ## ADR-008 — Use synchronous in-process coordination first
@@ -58,6 +58,6 @@
 
 ## ADR-010 — Treat development tools as optional tooling, not runtime architecture
 
-**Decision:** Amp and GitHub Copilot sandboxing may be used as development environments; neither is a TARA runtime dependency. GitHub Package Firewall is an optional Enterprise-only supply-chain control, not a baseline requirement. AWS TorchNeuron is a possible future inference infrastructure adapter only for an AWS Trainium deployment and remains behind the inference gateway boundary.  
-**Reason:** These tools solve different development, supply-chain and hardware-backend problems; none should define TARA's source architecture.  
-**Consequences:** TARA remains buildable and runnable without those optional services unless a future deployment explicitly adopts them.
+**Decision:** Amp and GitHub Copilot sandboxing may be used as development environments; neither is a SITA runtime dependency. GitHub Package Firewall is an optional Enterprise-only supply-chain control, not a baseline requirement. AWS TorchNeuron is a possible future inference infrastructure adapter only for an AWS Trainium deployment and remains behind the inference gateway boundary.  
+**Reason:** These tools solve different development, supply-chain and hardware-backend problems; none should define SITA's source architecture.  
+**Consequences:** SITA remains buildable and runnable without those optional services unless a future deployment explicitly adopts them.

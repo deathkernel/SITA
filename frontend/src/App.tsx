@@ -652,7 +652,7 @@ export default function App() {
     <div className={"app-shell" + (mobileSidebarOpen ? " sidebar-open" : "") + (inspectorOpen ? " inspector-open" : "")}>
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <span className="brand-mark">T</span>
+          <img className="brand-mark" src="/sita-mark.svg" alt="" aria-hidden="true" />
           <div><strong>SITA</strong><span>DEVELOPER WORKSPACE</span></div>
           <button className="sidebar-collapse" type="button" onClick={() => setMobileSidebarOpen(false)} aria-label="Close sidebar">×</button>
         </div>

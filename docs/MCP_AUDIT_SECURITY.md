@@ -2,7 +2,7 @@
 
 ## Scope
 
-TARA uses the existing `JsonlAuditLog` for MCP audit events. There is one
+SITA uses the existing `JsonlAuditLog` for MCP audit events. There is one
 audit implementation; the separate `McpAuditLog` proposal is not adopted.
 MCP remains opt-in and disabled by default.
 
@@ -30,9 +30,9 @@ fsyncs each record, and rotates the MCP log at a 1 MiB limit.
 - If the pre-dispatch `tool_call_started` event cannot be persisted, the
   one-shot approval remains consumed, the gateway is not called, and MCP
   audit health is marked degraded.
-- If the gateway fails, TARA attempts to persist a failure event and preserves
+- If the gateway fails, SITA attempts to persist a failure event and preserves
   the original gateway exception.
-- If a successful tool call cannot have its outcome event persisted, TARA
+- If a successful tool call cannot have its outcome event persisted, SITA
   returns the already-produced result and marks MCP audit health as degraded.
   The durable `tool_call_started` event remains evidence that dispatch began;
   callers must not blindly retry an operation whose outcome is uncertain.

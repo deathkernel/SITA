@@ -19,6 +19,8 @@ _ASSETS = {
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/app.css": ("app.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+    "/sita-mark.svg": ("sita-mark.svg", "image/svg+xml"),
+    "/site.webmanifest": ("site.webmanifest", "application/manifest+json"),
 }
 _MAX_REQUEST_BYTES = 14_000_000
 
