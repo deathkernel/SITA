@@ -195,7 +195,7 @@ def _ollama_settings(value: Any) -> dict[str, dict[str, str]]:
         raise RuntimeConfigurationError("ollama.base_url is invalid") from exc
     if (
         parsed.scheme not in {"http", "https"}
-        or parsed.hostname not in {"localhost", "127.0.0.1", "::1"}
+        or parsed.hostname not in {"localhost", "127.0.0.1", "::1", "host.docker.internal"}
         or parsed.username
         or parsed.password
         or parsed.path not in {"", "/"}
