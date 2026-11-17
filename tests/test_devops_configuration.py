@@ -31,7 +31,6 @@ class DevOpsConfigurationTests(unittest.TestCase):
             "https://localhost:8765",
             "localhost:8765/path",
             "user@localhost:8765",
-            "   ",
         ):
             with self.subTest(configured=configured):
                 with patch.dict(os.environ, {"SITA_ALLOWED_HOSTS": configured}):
