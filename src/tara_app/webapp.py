@@ -26,6 +26,20 @@ _ASSETS = {
 _MAX_REQUEST_BYTES = 14_000_000
 
 
+def _allowed_hosts(port: int) -> set[str]:
+    """Return exact Host header values accepted by the local HTTP boundary."""
+    configured = os.environ.get("SITA_ALLOWED_HOSTS", "").strip()
+    if not configured:
+        return {f"127.0.0.1:{port}", f"localhost:{port}"}
+    hosts = {item.strip().lower() for item in configured.split(",") if item.strip()}
+    if not hosts or any(
+        "/" in item or "://" in item or "@" in item or any(char.isspace() for char in item)
+        for item in hosts
+    ):
+        return set()
+    return hosts
+
+
 def _react_ui_enabled() -> bool:
     """Prefer the React workspace; set TARA_ENABLE_REACT_UI=0 for the static fallback."""
     return os.environ.get("TARA_ENABLE_REACT_UI", "1").strip() != "0"
@@ -238,14 +252,21 @@ class _Handler(BaseHTTPRequestHandler):
         self._json(200, outcome.to_payload())
 
     def _local_origin(self, *, require_origin: bool = False) -> bool:
-        host = self.headers.get("Host", "")
-        if host not in {f"127.0.0.1:{self.server.server_port}", f"localhost:{self.server.server_port}"}:
+        host = self.headers.get("Host", "").lower()
+        allowed_hosts = _allowed_hosts(self.server.server_port)
+        if host not in allowed_hosts:
             return False
         origin = self.headers.get("Origin")
         if origin is None:
             return not require_origin
         parsed = urlsplit(origin)
-        return parsed.scheme == "http" and parsed.netloc == host and parsed.path in {"", "/"} and not parsed.query and not parsed.fragment
+        return (
+            parsed.scheme == "http"
+            and parsed.netloc.lower() == host
+            and parsed.path in {"", "/"}
+            and not parsed.query
+            and not parsed.fragment
+        )
 
     def _json(self, status: int, payload: dict[str, Any]) -> None:
         encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
@@ -301,13 +322,22 @@ def _print_runtime_monitor(app: ApplicationFacade) -> None:
     print()
 
 
-def serve(app: ApplicationFacade, *, port: int = 8765) -> None:
-    """Serve the local UI on loopback only until interrupted."""
+def serve(
+    app: ApplicationFacade,
+    *,
+    port: int = 8765,
+    host: str | None = None,
+) -> None:
+    """Serve SITA locally; non-loopback binding requires explicit operator configuration."""
     if not 1024 <= port <= 65535:
         raise ValueError("port must be between 1024 and 65535")
-    server = _Server(("127.0.0.1", port), app)
+    bind_host = host or os.environ.get("SITA_BIND_HOST", "127.0.0.1").strip()
+    if bind_host not in {"127.0.0.1", "localhost", "0.0.0.0"}:
+        raise ValueError("SITA_BIND_HOST must be 127.0.0.1, localhost, or 0.0.0.0")
+    server = _Server((bind_host, port), app)
     try:
-        address = f"http://127.0.0.1:{port}"
+        display_host = "127.0.0.1" if bind_host == "0.0.0.0" else bind_host
+        address = f"http://{display_host}:{port}"
         if sys.stdout.isatty():
             print(f"\033[92m  [ READY ]\033[0m SITA is running at \033[96m{address}\033[0m", flush=True)
             print("\033[90m  Press Ctrl+C to stop the local server.\033[0m", flush=True)
