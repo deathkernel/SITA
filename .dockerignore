@@ -12,7 +12,6 @@ dist
 build
 *.egg-info
 frontend/node_modules
-frontend/package-lock.json
 src/tara_app/web/react-dist
 tests
 .env
