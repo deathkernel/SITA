@@ -243,7 +243,7 @@ def _omniroute_settings(value: Any) -> dict[str, dict[str, str]]:
         raise RuntimeConfigurationError("omniroute.base_url is invalid") from None
     if (
         parsed.scheme != "http"
-        or parsed.hostname not in {"localhost", "127.0.0.1", "::1"}
+        or parsed.hostname not in {"localhost", "127.0.0.1", "::1", "host.docker.internal"}
         or parsed.username or parsed.password
         or parsed.path != "/v1"
         or parsed.query or parsed.fragment
