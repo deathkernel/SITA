@@ -1,0 +1,43 @@
+services:
+  sita:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sita:local
+    container_name: sita
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      SITA_BIND_HOST: "0.0.0.0"
+      SITA_ALLOWED_HOSTS: "127.0.0.1:8765,localhost:8765"
+      TARA_MEMORY_DB: "/data/memory.sqlite3"
+      TARA_CHAT_MEMORY_PATH: "/data/chat-memory.json"
+      TARA_OMNIROUTE_BASE_URL: "${TARA_OMNIROUTE_BASE_URL:-http://host.docker.internal:20128/v1}"
+      TARA_OMNIROUTE_API_KEY: "${TARA_OMNIROUTE_API_KEY:-}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - sita-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/api/health', timeout=5).read()"
+      interval: 30s
+      timeout: 8s
+      retries: 3
+      start_period: 45s
+    stop_grace_period: 20s
+
+volumes:
+  sita-data:
