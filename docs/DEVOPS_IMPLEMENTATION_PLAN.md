@@ -95,18 +95,30 @@ Later:
 
 Exit gate: architecture and blockers documented before adding deployment manifests.
 
-### Phase 1 — Docker foundation
+### Phase 1 — Docker foundation (implementation drafted; verification pending)
 
-Deliver:
-- Multi-stage image: Node build stage + Python runtime stage.
-- Build frontend assets at image build time.
-- Install SITA package into the runtime image.
-- Non-root runtime user, minimal base image, pinned build inputs, OCI labels.
-- Configurable bind address; native launch remains loopback-only by default.
-- Strict configurable Host/Origin allowlist for the local Docker port mapping.
-- Docker Compose with loopback-only published port, health check, restart policy, and explicit persistent data mount.
-- `.dockerignore`, `.env.example`, and container build/run documentation.
-- No Docker socket mount and no privileged mode.
+Implemented on `devops/local-platform-foundation`:
+- [x] Multi-stage Node + Python image definition.
+- [x] React production build at image-build time.
+- [x] Python package installation at image-build time; no runtime package installation.
+- [x] Non-root UID/GID 10001, read-only root filesystem, bounded no-exec `/tmp`, dropped capabilities, and no-new-privileges.
+- [x] Explicit `SITA_BIND_HOST`; native launch remains loopback-only by default.
+- [x] Exact Host/Origin allowlist with loopback defaults; Compose publishes only to host loopback.
+- [x] Compose health check against the existing `/api/health` endpoint.
+- [x] Persistent named volume for the configured memory stores.
+- [x] Docker ignore rules, environment example, tests for the host/gateway allowlists, and local runbook.
+- [x] Docker host-gateway URL accepted for the separately managed local OmniRoute gateway; arbitrary remote gateway URLs remain rejected.
+
+Known limitations / work still required:
+- [ ] No committed `frontend/package-lock.json` yet. The ignore rules now permit it, but the Docker build still uses `npm install`, not `npm ci`; transitive frontend dependency resolution is not fully reproducible.
+- [ ] Build the image and run Compose on the target machine.
+- [ ] Verify the host OmniRoute gateway is reachable from Docker without exposing it publicly.
+- [ ] Verify UI, API, Host/Origin rejection, memory persistence, restart, and shutdown on the actual Docker runtime.
+- [ ] Add image scanning, SBOM, OCI source/revision labels, and pinned base-image digests in the hardening phase.
+
+The image and Compose definitions have not yet been built or executed in this environment. Do not mark Phase 1 complete until the exit gate has passing evidence.
+
+Runbook: [Local Docker deployment](LOCAL_DOCKER.md).
 
 Exit gate: image builds; container starts without installing packages at runtime; `/api/health` works; UI and API work through localhost; disallowed Host/Origin requests are rejected; persistence survives container recreation; secrets are absent from image/history/logs.
 
