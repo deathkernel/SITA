@@ -31,7 +31,7 @@ _POLICIES: dict[str, tuple[Capability, ...]] = {
         Capability("memory", "store", "Store information after explicit approval", False, True),
         Capability("memory", "forget", "Forget information after explicit approval", False, True),
     ),
-    "vision": (Capability("vision", "analyze", "Analyze user supplied images through OmniRoute", True),),
+    "vision": (Capability("vision", "analyze", "Analyze user supplied images through Gemini", True),),
     "data": (Capability("data", "analyze", "Analyze bounded tabular input", True),),
     "study": (Capability("study", "create", "Create source-grounded study notes, quizzes and flashcards or a bounded revision plan", True),),
     "weather": (Capability("weather", "forecast", "Fetch current conditions and short forecasts from public Open-Meteo endpoints", True),),
@@ -48,12 +48,12 @@ _POLICIES: dict[str, tuple[Capability, ...]] = {
     "handler": (Capability("handler", "diagnose", "Inspect the local developer environment", True),),
 }
 _REMOTE_MODULES = frozenset({"research", "voice", "weather", "models", "chat", "code", "vision", "creative"})
-_OMNIROUTE_MODULES = frozenset({"chat", "code", "vision", "creative", "models"})
+_GEMINI_MODULES = frozenset({"chat", "code", "vision", "creative", "models"})
 _LEGACY_LOCAL_MODEL_ENV = frozenset({
     "TARA_LLAMA_MODEL", "OLLAMA_HOST", "TARA_CODE_OLLAMA_URL",
     "TARA_CREATIVE_OLLAMA_URL", "TARA_VISION_OLLAMA_URL",
     "TARA_POWER_MODE", "TARA_LLM_TIMEOUT_SECONDS", "TARA_OLLAMA_KEEP_ALIVE",
-    "GEMINI_API_KEY",
+    "TARA_OMNIROUTE_API_KEY", "TARA_OMNIROUTE_BASE_URL", "TARA_OMNIROUTE_MODEL",
 })
 _OLLAMA_DEFAULT_MODELS = {
     "chat": "llama3.2:3b",
@@ -85,12 +85,12 @@ def create_application(config_path: str | Path) -> Orchestrator:
             config = tomllib.load(stream)
     except (OSError, tomllib.TOMLDecodeError) as exc:
         raise RuntimeConfigurationError("configuration file could not be read") from exc
-    if set(config) - {"router", "modules", "ollama", "omniroute", "mcp"}:
+    if set(config) - {"router", "modules", "ollama", "gemini", "mcp"}:
         raise RuntimeConfigurationError("configuration contains unsupported top-level settings")
 
     root = config_file.parent
     ollama_settings = _ollama_settings(config.get("ollama"))
-    omniroute_settings = _omniroute_settings(config.get("omniroute"))
+    gemini_settings = _gemini_settings(config.get("gemini"))
     router_config = _table(config.get("router"), "router")
     if set(router_config) - {"command", "working_directory", "timeout_seconds", "max_response_bytes"}:
         raise RuntimeConfigurationError("router contains unsupported settings")
@@ -119,7 +119,7 @@ def create_application(config_path: str | Path) -> Orchestrator:
         if module_id in _REMOTE_MODULES and item.get("allow_remote") is not True:
             registry.mark_disabled(
                 module_id,
-                "Remote processing is disabled. Set allow_remote = true in this module's [[modules]] entry only if you approve sending its content through OmniRoute.",
+                "Remote processing is disabled. Set allow_remote = true in this module's [[modules]] entry only if you approve sending its content through Gemini.",
             )
             continue
         env_names = item.get("environment", [])
@@ -227,66 +227,42 @@ def _ollama_settings(value: Any) -> dict[str, dict[str, str]]:
     return settings
 
 
-def _omniroute_settings(value: Any) -> dict[str, dict[str, str]]:
-    """Validate the local OmniRoute gateway and build per-specialist settings."""
-    config = {} if value is None else _table(value, "omniroute")
-    if set(config) - {"base_url", "model", "models"}:
-        raise RuntimeConfigurationError("omniroute contains unsupported settings")
-    base_url = os.environ.get("TARA_OMNIROUTE_BASE_URL", config.get("base_url", "http://127.0.0.1:20128/v1"))
-    if not isinstance(base_url, str) or not base_url.strip() or len(base_url) > 2048:
-        raise RuntimeConfigurationError("omniroute.base_url must be a bounded local URL")
-    base_url = base_url.strip().rstrip("/")
-    try:
-        parsed = urlsplit(base_url)
-        port = parsed.port
-    except ValueError:
-        raise RuntimeConfigurationError("omniroute.base_url is invalid") from None
-    if (
-        parsed.scheme != "http"
-        or parsed.hostname not in {"localhost", "127.0.0.1", "::1"}
-        or parsed.username or parsed.password
-        or parsed.path != "/v1"
-        or parsed.query or parsed.fragment
-        or (port is not None and not 1 <= port <= 65535)
-    ):
-        raise RuntimeConfigurationError("omniroute.base_url must target the local OmniRoute /v1 endpoint")
-
-    model_config = _table(config.get("models", {}), "omniroute.models")
-    chat_default = config.get("model", "auto")
-    if not isinstance(chat_default, str) or not chat_default.strip() or len(chat_default) > 200:
-        raise RuntimeConfigurationError("omniroute.model must be a bounded route identifier")
+def _gemini_settings(value: Any) -> dict[str, dict[str, str]]:
+    """Build per-specialist Gemini settings; API credentials stay in process env."""
+    config = {} if value is None else _table(value, "gemini")
+    if set(config) - {"model", "models"}:
+        raise RuntimeConfigurationError("gemini contains unsupported settings")
+    models = _table(config.get("models", {}), "gemini.models")
     defaults = {
-        "chat": ("TARA_OMNIROUTE_MODEL", chat_default),
-        "code": ("TARA_CODE_MODEL", "auto/coding:cheap"),
-        "vision": ("TARA_VISION_MODEL", "auto"),
-        "creative": ("TARA_CREATIVE_MODEL", "auto/cheap"),
-        "models": ("TARA_MODELS_MODEL", "auto"),
+        "chat": ("TARA_GEMINI_MODEL", config.get("model", "gemini-2.5-flash")),
+        "code": ("TARA_CODE_MODEL", "gemini-2.5-flash"),
+        "vision": ("TARA_VISION_MODEL", "gemini-2.5-flash"),
+        "creative": ("TARA_CREATIVE_MODEL", "gemini-2.5-flash"),
+        "models": ("TARA_MODELS_MODEL", config.get("model", "gemini-2.5-flash")),
     }
-    if set(model_config) - set(defaults):
-        raise RuntimeConfigurationError("omniroute.models contains an unsupported specialist")
-    api_key = os.environ.get("TARA_OMNIROUTE_API_KEY", "").strip()
-    if len(api_key) > 4096 or any(ord(char) < 33 or ord(char) == 127 for char in api_key):
-        raise RuntimeConfigurationError("TARA_OMNIROUTE_API_KEY is invalid")
-
+    if set(models) - set(defaults):
+        raise RuntimeConfigurationError("gemini.models contains an unsupported specialist")
+    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if len(key) > 4096 or any(ord(c) < 33 or ord(c) == 127 for c in key):
+        raise RuntimeConfigurationError("GEMINI_API_KEY is invalid")
     result: dict[str, dict[str, str]] = {}
-    for module_id, (model_env, default_model) in defaults.items():
-        model = os.environ.get(model_env, model_config.get(module_id, default_model))
-        if not isinstance(model, str) or not model.strip() or len(model) > 200 or any(char.isspace() or ord(char) < 32 for char in model):
-            raise RuntimeConfigurationError(f"omniroute.models.{module_id} must be a bounded route identifier")
-        common = {"TARA_OMNIROUTE_BASE_URL": base_url, "TARA_OMNIROUTE_API_KEY": api_key}
-        if module_id == "chat":
-            common.update({"TARA_OMNIROUTE_MODEL": model.strip(), "TARA_LLM_BACKEND": "omniroute"})
-        elif module_id == "code":
-            common.update({"TARA_CODE_API_BASE_URL": base_url, "TARA_CODE_API_KEY": api_key, "TARA_CODE_MODEL": model.strip()})
-        elif module_id == "vision":
-            common.update({"TARA_VISION_API_BASE_URL": base_url, "TARA_VISION_API_KEY": api_key, "TARA_VISION_MODEL": model.strip()})
-        elif module_id == "creative":
-            common.update({"TARA_CREATIVE_API_BASE_URL": base_url, "TARA_CREATIVE_API_KEY": api_key, "TARA_CREATIVE_MODEL": model.strip()})
+    for module, (env_name, default) in defaults.items():
+        model = os.environ.get(env_name, models.get(module, default))
+        if not isinstance(model, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", model):
+            raise RuntimeConfigurationError(f"gemini.models.{module} must be a valid Gemini model ID")
+        child = {"GEMINI_API_KEY": key, "TARA_GEMINI_MODEL": model}
+        if module == "chat":
+            child["TARA_LLM_BACKEND"] = "gemini"
+        elif module == "code":
+            child["TARA_CODE_MODEL"] = model
+        elif module == "vision":
+            child["TARA_VISION_MODEL"] = model
+        elif module == "creative":
+            child["TARA_CREATIVE_MODEL"] = model
         else:
-            common.update({"TARA_MODELS_API_BASE_URL": base_url, "TARA_MODELS_API_KEY": api_key, "TARA_MODELS_MODEL": model.strip()})
-        result[module_id] = common
+            child["TARA_MODELS_MODEL"] = model
+        result[module] = child
     return result
-
 
 def _table(value: Any, label: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
