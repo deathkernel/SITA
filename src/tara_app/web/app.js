@@ -34,8 +34,8 @@
       warning.className = "runtime-warning";
       warning.setAttribute("role", "alert");
       warning.textContent = chat.status === "disabled"
-        ? "Chat specialist is disabled. In sita.toml, set allow_remote = true in the [[modules]] entry with id = \"chat\" only if you approve sending Chat prompts through OmniRoute, then restart SITA. SITA will not change this privacy setting automatically."
-        : "Chat is configured, but its authenticated OmniRoute model-catalogue check failed. Verify that OmniRoute is running at the configured local /v1 address and that TARA_OMNIROUTE_API_KEY is valid, then restart SITA.";
+        ? "Chat specialist is disabled. In sita.toml, set allow_remote = true in the [[modules]] entry with id = \"chat\" only if you approve sending Chat prompts through Gemini API, then restart SITA. SITA will not change this privacy setting automatically."
+        : "Chat is configured, but its authenticated Gemini API model-catalogue check failed. Verify that Gemini API is running at Google AI Studio project access and that GEMINI_API_KEY is valid, then restart SITA.";
       const shell = document.querySelector(".shell");
       const modelPanel = document.querySelector("#model-panel");
       if (shell && modelPanel) shell.insertBefore(warning, modelPanel);
@@ -815,7 +815,7 @@
   async function refreshModelStatus() {
     if (modelPollTimer !== null) window.clearTimeout(modelPollTimer);
     modelPollTimer = null;
-    modelServiceStatus.textContent = "Checking OmniRoute model gateway...";
+    modelServiceStatus.textContent = "Checking Gemini API model gateway...";
     modelsRefresh.disabled = true;
     modelList.replaceChildren();
     try {
@@ -823,19 +823,19 @@
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Could not read model status");
       if (payload.status === "managed_externally" || payload.status === "not_configured") {
-        modelServiceStatus.textContent = "Model inventory and lifecycle are managed by OmniRoute. Use the Model Hub to list available models.";
+        modelServiceStatus.textContent = "Model inventory and lifecycle are managed by Gemini API. Use the Model Hub to list available models.";
         return;
       }
       const pull = payload.pull || {};
       const pullActive = ["queued", "pulling"].includes(pull.status);
       if (pull.status === "failed") {
-        modelServiceStatus.textContent = pull.message || "Model request failed in the configured OmniRoute gateway.";
+        modelServiceStatus.textContent = pull.message || "Model request failed in the configured Gemini API gateway.";
       } else if (pullActive) {
         modelServiceStatus.textContent = "Requesting " + String(pull.model || "local model") + "...";
       } else if (payload.service_available !== true) {
-        modelServiceStatus.textContent = "OmniRoute is not responding. Start the local gateway, then refresh.";
+        modelServiceStatus.textContent = "Gemini API is not responding. Start the local gateway, then refresh.";
       } else {
-        modelServiceStatus.textContent = "Model routing is managed by OmniRoute.";
+        modelServiceStatus.textContent = "Model routing is managed by Gemini API.";
       }
       for (const model of Array.isArray(payload.models) ? payload.models : []) {
         const item = document.createElement("li");
@@ -919,14 +919,14 @@
         modelPollTimer = window.setTimeout(refreshModelStatus, 2500);
       }
     } catch (error) {
-      modelServiceStatus.textContent = error.message || "OmniRoute model status is unavailable.";
+      modelServiceStatus.textContent = error.message || "Gemini API model status is unavailable.";
     } finally {
       modelsRefresh.disabled = false;
     }
   }
 
   async function startModelPull(specialist) {
-    modelServiceStatus.textContent = "Model lifecycle is managed by OmniRoute...";
+    modelServiceStatus.textContent = "Model lifecycle is managed by Gemini API...";
     try {
       const response = await fetch("/api/models/pull", {
         method: "POST",
@@ -937,12 +937,12 @@
       if (!response.ok) throw new Error(payload.error || "Could not start model download");
       await refreshModelStatus();
     } catch (error) {
-      modelServiceStatus.textContent = error.message || "Model lifecycle is managed by OmniRoute.";
+      modelServiceStatus.textContent = error.message || "Model lifecycle is managed by Gemini API.";
     }
   }
 
   async function unloadModel(specialist) {
-    modelServiceStatus.textContent = "Model lifecycle is managed by OmniRoute...";
+    modelServiceStatus.textContent = "Model lifecycle is managed by Gemini API...";
     try {
       const response = await fetch("/api/models/unload", {
         method: "POST",
@@ -957,7 +957,7 @@
       await refreshModelStatus();
       modelServiceStatus.textContent = message;
     } catch (error) {
-      modelServiceStatus.textContent = error.message || "Model lifecycle is managed by OmniRoute.";
+      modelServiceStatus.textContent = error.message || "Model lifecycle is managed by Gemini API.";
     }
   }
 
@@ -969,7 +969,7 @@
       "Remove " + modelName + " from this device? It can be installed again later." + sharedProfiles
     );
     if (!confirmed) return;
-    modelServiceStatus.textContent = "Model lifecycle is managed by OmniRoute...";
+    modelServiceStatus.textContent = "Model lifecycle is managed by Gemini API...";
     try {
       const response = await fetch("/api/models/remove", {
         method: "POST",
@@ -984,7 +984,7 @@
       await refreshModelStatus();
       modelServiceStatus.textContent = message;
     } catch (error) {
-      modelServiceStatus.textContent = error.message || "Model lifecycle is managed by OmniRoute.";
+      modelServiceStatus.textContent = error.message || "Model lifecycle is managed by Gemini API.";
     }
   }
 
