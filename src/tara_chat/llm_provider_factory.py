@@ -1,17 +1,12 @@
-"""OmniRoute-only provider factory for SITA language-model inference."""
+"""Gemini-only provider factory for SITA."""
 from __future__ import annotations
-
 import os
+from .gemini_provider import GeminiProvider
 
-from .omniroute_provider import OmniRouteProvider
+def provider_from_env() -> GeminiProvider:
+    backend=os.getenv("TARA_LLM_BACKEND","gemini").strip().lower()
+    if backend!="gemini":
+        raise ValueError("SITA supports Gemini only; set TARA_LLM_BACKEND=gemini")
+    return GeminiProvider.from_env()
 
-
-def provider_from_env() -> OmniRouteProvider:
-    """Create the only supported SITA-Chat inference provider: OmniRoute."""
-    backend = os.getenv("TARA_LLM_BACKEND", "omniroute").strip().lower()
-    if backend != "omniroute":
-        raise ValueError("SITA supports OmniRoute only; set TARA_LLM_BACKEND=omniroute")
-    return OmniRouteProvider.from_env()
-
-
-__all__ = ["provider_from_env"]
+__all__=["provider_from_env"]
