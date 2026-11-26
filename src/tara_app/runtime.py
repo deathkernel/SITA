@@ -235,11 +235,11 @@ def _gemini_settings(value: Any) -> dict[str, dict[str, str]]:
         raise RuntimeConfigurationError("gemini contains unsupported settings")
     models = _table(config.get("models", {}), "gemini.models")
     defaults = {
-        "chat": ("TARA_GEMINI_MODEL", config.get("model", "gemini-2.5-flash")),
-        "code": ("TARA_CODE_MODEL", "gemini-2.5-flash"),
-        "vision": ("TARA_VISION_MODEL", "gemini-2.5-flash"),
-        "creative": ("TARA_CREATIVE_MODEL", "gemini-2.5-flash"),
-        "models": ("TARA_MODELS_MODEL", config.get("model", "gemini-2.5-flash")),
+        "chat": ("TARA_GEMINI_MODEL", config.get("model", "gemini-3.8-flash")),
+        "code": ("TARA_CODE_MODEL", "gemini-3.8-flash"),
+        "vision": ("TARA_VISION_MODEL", "gemini-3.8-flash"),
+        "creative": ("TARA_CREATIVE_MODEL", "gemini-3.8-flash"),
+        "models": ("TARA_MODELS_MODEL", config.get("model", "gemini-3.8-flash")),
     }
     if set(models) - set(defaults):
         raise RuntimeConfigurationError("gemini.models contains an unsupported specialist")
