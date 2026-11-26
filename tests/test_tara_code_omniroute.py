@@ -28,7 +28,7 @@ class GeminiCodeTests(unittest.TestCase):
                 self.request=request;self.timeout=timeout
                 return Response({"candidates":[{"content":{"parts":[{"text":"Review plan"}]}}]})
         fake=Fake()
-        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_CODE_MODEL":"gemini-2.5-flash"},clear=True),patch.object(code,"_omniroute_opener",return_value=fake):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_CODE_MODEL":"gemini-2.5-flash"},clear=True),patch.object(code,"_gemini_opener",return_value=fake):
             result=code.handle_request(self.request())
         self.assertEqual(result["status"],"success")
         self.assertEqual(result["data"]["provider"],"gemini")
@@ -40,7 +40,7 @@ class GeminiCodeTests(unittest.TestCase):
         self.assertNotIn("messages",body)
         self.assertEqual(fake.timeout,150)
     def test_missing_key_fails_closed(self):
-        with patch.dict(os.environ,{},clear=True),patch.object(code,"_omniroute_opener") as opener:
+        with patch.dict(os.environ,{},clear=True),patch.object(code,"_gemini_opener") as opener:
             result=code.handle_request(self.request())
         self.assertEqual(result["status"],"unavailable")
         opener.assert_not_called()
@@ -49,7 +49,7 @@ class GeminiCodeTests(unittest.TestCase):
             def open(self,request,timeout):
                 self.request=request; return Response({"models":[]})
         fake=Fake(); req=self.request();req["action"]="health"
-        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key"},clear=True),patch.object(code,"_omniroute_opener",return_value=fake):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key"},clear=True),patch.object(code,"_gemini_opener",return_value=fake):
             result=code.handle_request(req)
         self.assertEqual(result["status"],"success")
         self.assertTrue(fake.request.full_url.endswith("/v1beta/models?pageSize=1"))
@@ -57,7 +57,7 @@ class GeminiCodeTests(unittest.TestCase):
     def test_error_body_does_not_leak(self):
         class Fake:
             def open(self,request,timeout): raise HTTPError(request.full_url,401,"Unauthorized",{},BytesIO(b"secret response"))
-        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key"},clear=True),patch.object(code,"_omniroute_opener",return_value=Fake()):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key"},clear=True),patch.object(code,"_gemini_opener",return_value=Fake()):
             result=code.handle_request(self.request())
         self.assertEqual(result["status"],"unavailable")
         self.assertNotIn("secret response",result["error"])
