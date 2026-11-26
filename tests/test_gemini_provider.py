@@ -40,8 +40,8 @@ class GeminiProviderTests(unittest.TestCase):
             p=provider_from_env()
         self.assertIsInstance(p,GeminiProvider)
         self.assertEqual(p.model,"gemini-3.8-flash")
-    def test_factory_rejects_old_gateway(self):
-        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_LLM_BACKEND":"omniroute"},clear=True):
+    def test_factory_rejects_non_gemini_backend(self):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_LLM_BACKEND":"other-provider"},clear=True):
             with self.assertRaisesRegex(ValueError,"Gemini only"): provider_from_env()
 
 
