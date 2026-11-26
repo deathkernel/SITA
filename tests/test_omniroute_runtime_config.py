@@ -10,13 +10,13 @@ class GeminiRuntimeConfigTests(unittest.TestCase):
         path=root/"sita.toml"
         path.write_text("""
 [gemini]
-model = "gemini-2.5-flash"
+model = "gemini-3.8-flash"
 [gemini.models]
-chat = "gemini-2.5-flash"
-code = "gemini-2.5-flash"
-vision = "gemini-2.5-flash"
-creative = "gemini-2.5-flash"
-models = "gemini-2.5-flash"
+chat = "gemini-3.8-flash"
+code = "gemini-3.8-flash"
+vision = "gemini-3.8-flash"
+creative = "gemini-3.8-flash"
+models = "gemini-3.8-flash"
 [router]
 command = ["{python}", "-c", "pass"]
 working_directory = "."
@@ -60,7 +60,7 @@ environment = ["TARA_MODELS_MODEL", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
             for module in ("chat","code","vision","creative","models"):
                 env=app.registry.adapter(module).environment
                 self.assertEqual(env["GEMINI_API_KEY"],"local-test-key")
-                self.assertEqual(env["TARA_GEMINI_MODEL"],"gemini-2.5-flash")
+                self.assertEqual(env["TARA_GEMINI_MODEL"],"gemini-3.8-flash")
                 self.assertFalse(any("OMNIROUTE" in k for k in env))
                 self.assertFalse(any("OLLAMA" in k for k in env))
             self.assertEqual(app.registry.adapter("chat").environment["TARA_LLM_BACKEND"],"gemini")
