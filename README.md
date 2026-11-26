@@ -462,8 +462,8 @@ flowchart LR
   SITA --> Local[(Local sessions / SQLite)]
   SITA --> Research[Crossref / Wikipedia public APIs]
   SITA --> Weather[Open-Meteo public API]
-  SITA --> Omni[Gemini API]
-  Omni --> Cloud[Configured provider, possibly cloud]
+  SITA --> Gemini[Google Gemini Developer API]
+  Gemini --> Model[Configured Google-hosted Gemini model]
   SITA --> Speech[Optional on-device transcription]
   SITA --> CSV[Read-only CSV summaries]
 ```
@@ -474,9 +474,8 @@ flowchart LR
 flowchart TB
   App[SITA: product and orchestration] --> Capability[Specialist capability / adapter]
   Capability --> Inference[Model inference request]
-  Inference --> Omni[Gemini API: routing and provider lifecycle]
-  Omni --> Runtime[Configured provider / runtime]
-  Runtime --> Model[Actual model and weights]
+  Inference --> Gemini[Google Gemini Developer API: generateContent]
+  Gemini --> Model[Configured Gemini model]
   Capability --> Tool[Deterministic local tool / engine]
 ```
 
@@ -522,4 +521,4 @@ For the full feature-by-feature architecture reference—including specialist wo
 
 SITA Chat now builds a bounded request context using a dependency-free UTF-8 token estimate. The current user request and system instructions are reserved first; recent history and relevant saved memories are optional, priority-ranked sections that are omitted whole when they do not fit. The estimate is exposed separately from actual provider usage. When Gemini API returns usage metadata, SITA captures the reported prompt, completion and total token counts; missing usage remains unknown. The default completion budget remains 1,536 tokens and the initial input-context budget is configurable in the chat runtime constructor (12,000 estimated tokens by default).
 
-MCP tool discovery caches read-only tool metadata for 20 seconds by default to avoid repeatedly starting stdio servers for the same catalogue. Cache entries are scoped to each server configuration and can be explicitly invalidated. MCP tool descriptions, JSON schemas and returned text have bounded sizes to prevent oversized metadata/results from flooding model context. Tool calls are not cached; approval grants remain one-shot and audit-gated. Set the gateway's `tool_cache_ttl_seconds=0` to disable metadata caching.
+MCP tool discovery caches read-only tool metadata for 20 seconds by default to avoid repeatedly starting stdio servers for the same catalogue. Cache entries are scoped to each server configuration and can be explicitly invalidated. MCP tool descriptions, JSON schemas and returned text have bounded sizes to prevent oversized metadata/results from flooding model context. Tool calls are not cached; approval grants remain one-shot and audit-gated. Set the MCP tool gateway's `tool_cache_ttl_seconds=0` to disable metadata caching.
