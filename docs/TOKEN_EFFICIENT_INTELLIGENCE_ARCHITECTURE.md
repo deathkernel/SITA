@@ -4,7 +4,7 @@
 
 ## 1. Objective
 
-Maximize useful work and answer quality per unit of paid inference usage. Minimize unnecessary input/output tokens, not necessary detail. SITA remains local-first and uses OmniRoute as its only language-model gateway. SITA owns intent routing, context assembly, memory, caching policy, local usage accounting, and permissions. OmniRoute owns provider/model lifecycle and provider-side routing.
+Maximize useful work and answer quality per unit of paid inference usage. Minimize unnecessary input/output tokens, not necessary detail. SITA remains local-first and calls the Google Gemini Developer API directly for language-model inference. SITA owns intent routing, specialist/model selection, context assembly, memory, caching policy, local usage accounting, and permissions. Google's API provides hosted inference and reports model usage when available.
 
 Success means fewer repeated prompt/history tokens, fewer avoidable model calls, less irrelevant context, safe reuse, and measured savings without quality regression.
 
@@ -17,7 +17,7 @@ User request
   -> context planner (recent turns + compact summary + relevant memory + needed excerpts)
   -> token budget planner (estimate input, reserve output, enforce context limits)
   -> inference route policy (economical / standard / complex)
-  -> OmniRoute (single inference boundary)
+  -> Google Gemini Developer API (direct inference endpoint)
   -> response validation and optional bounded completion
   -> local usage ledger, session update, audit
 ```
@@ -52,14 +52,14 @@ Do not hard-code tiny output limits to make metrics look good. Keep SITA Chat's 
 
 ### 3.4 Inference and model-tier policy
 
-SITA keeps OmniRoute as its only inference gateway. SITA may select configured route aliases by task class but must not call provider APIs directly or silently fall back to Ollama/Gemini.
+SITA uses Google's Gemini Developer API as its configured inference API. SITA selects concrete Gemini model IDs by specialist/task class and does not use OmniRoute, Ollama, or silent provider fallback.
 
 - Deterministic/local path for work that does not need inference.
 - Economical configured route for routine extraction, summaries, and straightforward questions.
 - Standard route for normal conversation and coding explanation.
 - Stronger configured route for difficult reasoning, code review, and research synthesis.
 
-Explicit user model selection takes precedence. If unavailable or disallowed, explain the failure rather than silently switching. Tier labels are policy labels, not assumptions about real price/capability; use verified OmniRoute catalogue/configuration data.
+Explicit user model selection takes precedence. If unavailable or disallowed, explain the failure rather than silently switching. Tier labels are policy labels, not assumptions about real price/capability; use verified Gemini model catalogue/configuration data.
 
 ### 3.5 Safe caching
 
@@ -86,7 +86,7 @@ The first implementation slice now exists in the runtime:
 
 - `tara_chat.token_budget` provides deterministic UTF-8 token estimation and priority-based context packing. The estimate is explicitly approximate and is not reported as provider usage.
 - `TARABrain` preserves the current user request and system prompt, budgets relevant saved memories, and includes a bounded recent-turn window only when it fits. It reports omitted context and estimated input tokens in `BrainResponse`.
-- `OmniRouteProvider` captures provider-reported prompt/completion/total usage when present; missing usage remains unknown.
+- `GeminiProvider` captures provider-reported prompt/completion/total usage when present; missing usage remains unknown.
 - `McpToolGateway` caches read-only tool metadata briefly per server configuration, exposes explicit invalidation, and bounds descriptions, schemas, and tool result text. Tool calls and approvals are never cached.
 
 Not yet implemented: model-specific tokenizer integration, persistent incremental conversation summaries, model-tier routing, response caching, and a persistent usage dashboard/ledger. These remain separate phases and must not be described as shipped.
@@ -118,14 +118,14 @@ Choose defaults from verified route capabilities and tests, not guesses. Invalid
 
 ## 7. Privacy and security
 
-Conversation history, summaries, memory, cache, and usage ledger remain under SITA's local data controls. Send only minimum required context through OmniRoute and preserve existing remote-transfer opt-in. Resolve session/workspace scope before retrieval or cache lookup. Model, cache, memory, file, and tool outputs remain untrusted. Cache never approves or executes actions. Apply redaction before persistence and remote inference where supported. Deletion/retention must include summaries, caches, embeddings, and usage records.
+Conversation history, summaries, memory, cache, and usage ledger remain under SITA's local data controls. Send only the minimum required context to Google's Gemini API and preserve existing remote-transfer opt-in. Resolve session/workspace scope before retrieval or cache lookup. Model, cache, memory, file, and tool outputs remain untrusted. Cache never approves or executes actions. Apply redaction before persistence and remote inference where supported. Deletion/retention must include summaries, caches, embeddings, and usage records.
 
 ## 8. Implementation phases
 
 1. **Baseline:** measure current payload size, provider usage when available, latency, and answer quality. No behavior changes.
 2. **Context foundation:** typed context sections, token estimator interface, budget planner, bounded relevant history, tests.
 3. **Memory compaction:** versioned incremental summaries, relevance-ranked memory, invalidation, correction/constraint retention tests.
-4. **Routing tiers:** deterministic local routes and configurable OmniRoute aliases; preserve explicit user selection and fail-closed behavior.
+4. **Routing tiers:** deterministic local routes and configured Gemini model IDs; preserve explicit user selection and fail-closed behavior.
 5. **Cache and ledger:** deterministic cache first, then narrow allowlisted inference cache; separate estimated and actual usage.
 6. **Evaluation/rollout:** offline regression tests and opt-in shadow comparisons; measure quality, factuality, completion, latency, and provider-reported tokens; feature flags and independent kill switches.
 
@@ -136,7 +136,7 @@ Conversation history, summaries, memory, cache, and usage ledger remain under SI
 - Compaction preserves corrections and active constraints.
 - Irrelevant memories/attachments are excluded.
 - User-selected routes are never silently overridden.
-- All inference still passes through OmniRoute.
+- All model-dependent inference uses the configured Gemini Developer API client.
 - Cache keys isolate sessions, workspaces, routes, and policy versions.
 - Sensitive/live-state requests bypass response caching.
 - Cache never bypasses authorization, approvals, or audit.
@@ -146,4 +146,4 @@ Conversation history, summaries, memory, cache, and usage ledger remain under SI
 
 ## 10. Non-goals
 
-No zero-token AI, free inference guarantee, unlimited context, perfect semantic cache, or guaranteed provider prompt-cache discount. No direct provider integrations, hidden remote transfer, autonomous permissions, or always-on LLM critic.
+No zero-token AI, free inference guarantee, unlimited context, perfect semantic cache, or guaranteed provider prompt-cache discount. No additional provider integrations, hidden remote transfer, autonomous permissions, or always-on LLM critic.
