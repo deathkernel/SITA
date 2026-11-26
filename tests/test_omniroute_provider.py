@@ -1,106 +1,24 @@
 from __future__ import annotations
-
-import os
-import unittest
+import os, unittest
 from unittest.mock import patch
-
 from tara_chat.gemini_provider import GeminiProvider
 from tara_chat.llm_provider_factory import provider_from_env
 
 
-class OmniRouteProviderTests(unittest.TestCase):
-    def test_sends_auto_route_alias_and_system_context(self):
-        calls = []
-
-        def transport(url, payload, api_key, timeout):
-            calls.append((url, payload, api_key, timeout))
-            return {"choices": [{"message": {"content": "Hello from SITA"}}]}
-
-        provider = OmniRouteProvider(
-            api_key="test-key",
-            transport=transport,
-        )
-        result = provider.complete(
-            "Hi",
-            system="You are SITA",
-            max_completion_tokens=128,
-            temperature=0.2,
-        )
-
-        self.assertEqual(result, "Hello from SITA")
-        url, payload, key, timeout = calls[0]
-        self.assertEqual(url, "http://127.0.0.1:20128/v1/chat/completions")
-        self.assertEqual(payload["model"], "auto")
-        self.assertEqual(payload["stream"], False)
-        self.assertEqual(payload["messages"][0], {"role": "system", "content": "You are SITA"})
-        self.assertEqual(key, "test-key")
-        self.assertEqual(timeout, 180.0)
-
-    def test_captures_provider_reported_usage_without_inventing_missing_fields(self):
-        provider = OmniRouteProvider(
-            api_key="test-key",
-            transport=lambda *args: {
-                "choices": [{"message": {"content": "answer"}}],
-                "usage": {"prompt_tokens": 120, "completion_tokens": 35, "total_tokens": 155},
-            },
-        )
-        self.assertEqual(provider.complete("hello"), "answer")
-        self.assertEqual(
-            provider.last_usage,
-            {"prompt_tokens": 120, "completion_tokens": 35, "total_tokens": 155},
-        )
-
-    def test_missing_provider_usage_remains_unknown(self):
-        provider = OmniRouteProvider(
-            api_key="test-key",
-            transport=lambda *args: {"choices": [{"message": {"content": "answer"}}]},
-        )
-        provider.complete("hello")
-        self.assertIsNone(provider.last_usage)
-
-    def test_supports_specialized_auto_route_alias(self):
-        provider = OmniRouteProvider(api_key="test-key", model="auto/coding")
-        self.assertEqual(provider.model, "auto/coding")
-
-    def test_requires_api_key_and_v1_base_url(self):
-        with self.assertRaises(ValueError):
-            OmniRouteProvider(api_key="")
-        with self.assertRaises(ValueError):
-            OmniRouteProvider(api_key="test-key", base_url="http://127.0.0.1:20128")
-
-    def test_rejects_non_loopback_gateway(self):
-        with self.assertRaises(ValueError):
-            OmniRouteProvider(api_key="test-key", base_url="https://gateway.example/v1")
-
-    def test_rejects_redirect_like_invalid_model_input(self):
-        with self.assertRaises(ValueError):
-            OmniRouteProvider(api_key="test-key", model="auto route")
-
-    def test_rejects_empty_or_malformed_completion(self):
-        provider = OmniRouteProvider(api_key="test-key", transport=lambda *args: {"choices": []})
-        with self.assertRaisesRegex(RuntimeError, "chat completion"):
-            provider.complete("hello")
-
-    def test_factory_selects_gemini_only_when_explicitly_enabled(self):
-        env = {
-            "TARA_LLM_BACKEND": "gemini",
-            "GEMINI_API_KEY": "test-key",
-        }
-        with patch.dict(os.environ, env, clear=True):
-            provider = provider_from_env()
-        self.assertIsInstance(provider, GeminiProvider)
-        self.assertEqual(provider.model, "gemini-2.5-flash")
-
+class GeminiProviderFactoryTests(unittest.TestCase):
+    def test_factory_selects_gemini_when_explicitly_enabled(self):
+        with patch.dict(os.environ,{"TARA_LLM_BACKEND":"gemini","GEMINI_API_KEY":"test-key"},clear=True):
+            provider=provider_from_env()
+        self.assertIsInstance(provider,GeminiProvider)
+        self.assertEqual(provider.model,"gemini-3.8-flash")
     def test_factory_defaults_to_gemini(self):
-        with patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"}, clear=True):
-            provider = provider_from_env()
-        self.assertIsInstance(provider, OmniRouteProvider)
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key"},clear=True):
+            provider=provider_from_env()
+        self.assertIsInstance(provider,GeminiProvider)
+        self.assertEqual(provider.model,"gemini-3.8-flash")
+    def test_factory_rejects_non_gemini_backend(self):
+        with patch.dict(os.environ,{"TARA_LLM_BACKEND":"omniroute","GEMINI_API_KEY":"test-key"},clear=True):
+            with self.assertRaisesRegex(ValueError,"Gemini only"): provider_from_env()
 
-    def test_factory_rejects_omniroute_backend(self):
-        with patch.dict(os.environ, {"TARA_LLM_BACKEND": "omniroute", "GEMINI_API_KEY": "test-key"}, clear=True):
-            with self.assertRaisesRegex(ValueError, "Gemini only"):
-                provider_from_env()
 
-
-if __name__ == "__main__":
-    unittest.main()
+if __name__=="__main__": unittest.main()
