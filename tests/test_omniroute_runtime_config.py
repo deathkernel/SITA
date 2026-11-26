@@ -65,6 +65,32 @@ environment = ["TARA_MODELS_MODEL", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
                 self.assertFalse(any("OLLAMA" in k for k in env))
             self.assertEqual(app.registry.adapter("chat").environment["TARA_LLM_BACKEND"],"gemini")
             self.assertIsNone(app.model_catalog)
+
+    def test_local_dotenv_loads_key_without_overriding_process_environment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = self._make_config(root)
+            (root / ".env").write_text(
+                "GEMINI_API_KEY=dotenv-test-key\nTARA_GEMINI_MODEL=gemini-2.5-flash\n",
+                encoding="utf-8",
+            )
+            with patch.dict(os.environ, {}, clear=True):
+                app = create_application(config)
+                self.assertEqual(
+                    app.registry.adapter("chat").environment["GEMINI_API_KEY"],
+                    "dotenv-test-key",
+                )
+                self.assertEqual(
+                    app.registry.adapter("chat").environment["TARA_GEMINI_MODEL"],
+                    "gemini-2.5-flash",
+                )
+            with patch.dict(os.environ, {"GEMINI_API_KEY": "process-key"}, clear=True):
+                app = create_application(config)
+                self.assertEqual(
+                    app.registry.adapter("chat").environment["GEMINI_API_KEY"],
+                    "process-key",
+                )
+
     def test_remote_specialist_opt_in_stays_explicit(self):
         with tempfile.TemporaryDirectory() as directory:
             config=Path(directory)/"sita.toml"

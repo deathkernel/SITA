@@ -117,11 +117,14 @@ See [runtime and development option notes](docs/runtime-evaluation.md) for the c
 
 SITA uses Google's Gemini Developer API directly for Chat, Code, Vision, Creative, and Model Hub. SITA's local router selects the specialist; each specialist sends a bounded request to its configured Gemini model. The default model is `gemini-3.8-flash`, and each specialist can override it in `[gemini.models]` or through its model environment variable.
 
-Copy `sita.example.toml` to `sita.toml`. Set the API key in the same PowerShell session that launches SITA:
+Copy `sita.example.toml` to `sita.toml` and `.env.example` to `.env`, then replace the placeholder API key in `.env`:
 
-```powershell
-$env:GEMINI_API_KEY = Read-Host "Gemini API key"
+```dotenv
+GEMINI_API_KEY=your_actual_api_key_here
+TARA_GEMINI_MODEL=gemini-3.8-flash
 ```
+
+SITA loads this file automatically at startup. `.env` and `sita.toml` are ignored by Git; never commit API credentials.
 
 The key is sent in the `x-goog-api-key` HTTP header; it is never stored in `sita.toml`, source code, frontend configuration, prompts, or logs. Do not commit the key. The launcher does not require a local model gateway.
 
