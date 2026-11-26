@@ -103,17 +103,17 @@ def _post_chat_completion(url: str, payload: dict[str, Any], api_key: str) -> di
         with build_opener(ProxyHandler({}), _NoRedirect()).open(request, timeout=180) as response:
             raw = response.read(MAX_RESPONSE_BYTES + 1)
     except HTTPError as exc:
-        raise RuntimeError(f"OmniRoute returned HTTP {exc.code}") from None
+        raise RuntimeError(f"Gemini API returned HTTP {exc.code}") from None
     except (URLError, TimeoutError, OSError):
-        raise RuntimeError("OmniRoute gateway is unavailable") from None
+        raise RuntimeError("Gemini API gateway is unavailable") from None
     if len(raw) > MAX_RESPONSE_BYTES:
-        raise RuntimeError("OmniRoute returned an oversized vision response")
+        raise RuntimeError("Gemini API returned an oversized vision response")
     try:
         body = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError):
-        raise RuntimeError("OmniRoute returned malformed JSON") from None
+        raise RuntimeError("Gemini API returned malformed JSON") from None
     if not isinstance(body, Mapping):
-        raise RuntimeError("OmniRoute returned an invalid vision response")
+        raise RuntimeError("Gemini API returned an invalid vision response")
     choices = body.get("choices")
     first = choices[0] if isinstance(choices, list) and choices else None
     message = first.get("message") if isinstance(first, Mapping) else None
@@ -121,7 +121,7 @@ def _post_chat_completion(url: str, payload: dict[str, Any], api_key: str) -> di
     if isinstance(text, list):
         text = "\n".join(part.get("text", "") for part in text if isinstance(part, Mapping) and isinstance(part.get("text"), str))
     if not isinstance(text, str) or not text.strip():
-        raise RuntimeError("OmniRoute returned no vision analysis")
+        raise RuntimeError("Gemini API returned no vision analysis")
     return {"text": text.strip(), "model": body.get("model")}
 
 
