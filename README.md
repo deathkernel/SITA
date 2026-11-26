@@ -123,7 +123,7 @@ All SITA language-model requests use the local Gemini API gateway. This includes
 - **Vision route:** `auto` (must resolve to a vision-capable model)
 - **Creative route:** `auto/cheap`
 - **Model Hub route:** `auto`
-- **Authentication:** set `TARA_OMNIROUTE_API_KEY` in the process environment. Never commit the key or place it in frontend configuration.
+- **Authentication:** set `GEMINI_API_KEY` in the process environment. Never commit the key or place it in frontend configuration.
 - **No local fallback:** if Gemini API or its API key is unavailable, the affected inference request fails closed. SITA does not silently fall back to direct Ollama or Gemini calls.
 
 The route aliases are passed to Gemini API; they are not concrete model IDs. Provider availability, model IDs, quotas, billing, and fallback behavior depend on the connected providers and routing policy configured inside Gemini API.
@@ -174,7 +174,7 @@ SITA now includes the local Router, Chat, Code, Planner, Memory, Creative, Secur
 
 1. Install Python 3.11 or newer and configure a running Gemini API gateway.
 2. Clone this repository.
-3. Set `$env:TARA_OMNIROUTE_API_KEY = Read-Host 'Gemini API API key'` in PowerShell.
+3. Set `$env:GEMINI_API_KEY = Read-Host 'Gemini API key'` in PowerShell.
 4. Run `.\run-sita.bat` in that same PowerShell window.
 
 The launcher creates a local virtual environment, installs this repository, creates `sita.toml` from the example when needed, prepares the optional native Handler diagnostic, and starts SITA. SITA does not install, start, or call Ollama for language-model inference; the configured Gemini API gateway handles model routing.
@@ -184,7 +184,7 @@ The launcher creates a local virtual environment, installs this repository, crea
 
 1. Install Python 3.11 or newer and configure a running Gemini API gateway.
 2. Clone this repository.
-3. Export `TARA_OMNIROUTE_API_KEY` in the shell environment.
+3. Export `GEMINI_API_KEY` in the shell environment.
 4. Run `./run-sita.sh` from the repository folder.
 
 The script creates a virtual environment, installs SITA, initializes the local config, explicitly prepares the optional native Handler diagnostic, and starts the app. If a local CMake/C++ toolchain is missing, Handler keeps working through the read-only Python fallback. All language-model requests still go through Gemini API.
@@ -236,7 +236,7 @@ The first release intentionally avoids pretending deterministic sentence extract
 ### Configure Gemini API (PowerShell)
 
 1. Start Gemini API and confirm its local gateway is reachable at `http://127.0.0.1:20128`.
-2. In the same PowerShell window used to start SITA, set `$env:TARA_OMNIROUTE_API_KEY = Read-Host "Gemini API API key"`.
+2. In the same PowerShell window used to start SITA, set `$env:GEMINI_API_KEY = Read-Host "Gemini API key"`.
 3. Start SITA normally. The example config selects `auto` for Chat, `auto/coding:cheap` for Code, `auto` for Vision, and `auto/cheap` for Creative.
 4. Check `GET /v1/models` through Gemini API to inspect connected model IDs.
 
@@ -309,7 +309,7 @@ Chat, Code, Vision, Creative, and Model Hub all use the locally hosted Gemini AP
 
 SITA exposes a read-only repository audit through its local Chat capability. In the app, ask **"Audit this repository"** or **"Check this project"**. The deterministic Router selects `chat.audit_repository`; the Chat adapter scans its configured working directory (the example configuration uses the repository root). The operation does not initialize an LLM, execute shell commands, accept file attachments, modify files, or upload repository content.
 
-The interactive SITA Chat CLI also supports an explicit local command. From the repository folder, start `python -m tara_chat` and enter `/audit`. This read-only command does not require an Gemini API API key or initialize a model; ordinary chat replies still require a configured Gemini API gateway.
+The interactive SITA Chat CLI also supports an explicit local command. From the repository folder, start `python -m tara_chat` and enter `/audit`. This read-only command does not require an Gemini API key or initialize a model; ordinary chat replies still require a configured Gemini API gateway.
 
 ```text
 /audit
