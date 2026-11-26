@@ -23,7 +23,7 @@ class GeminiHealthTests(unittest.TestCase):
             self.assertTrue(check_gateway(api_key="safe-key"))
         self.assertEqual(opener.request.full_url,"https://generativelanguage.googleapis.com/v1beta/models?pageSize=1")
         self.assertEqual(opener.request.get_header("X-goog-api-key"),"safe-key")
-        self.assertEqual(opener.timeout,8.0)
+        self.assertEqual(opener.timeout,5.0)
     def test_missing_key_diagnostic_is_specific(self):
         self.assertIn("GEMINI_API_KEY",diagnose_gateway(api_key=""))
     def test_auth_failure_does_not_leak_key(self):
