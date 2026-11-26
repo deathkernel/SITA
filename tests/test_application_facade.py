@@ -85,7 +85,7 @@ class ApplicationFacadeTests(unittest.TestCase):
         self.assertEqual(payload["app"], "SITA")
         self.assertEqual(payload["status"], "degraded")
         self.assertEqual(payload["capabilities"], [])
-        self.assertEqual(payload["model_runtime"], "omniroute")
+        self.assertEqual(payload["model_runtime"], "gemini")
 
     def test_health_status_checks_each_registered_specialist_independently(self):
         registry = CapabilityRegistry()
