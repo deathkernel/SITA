@@ -34,7 +34,7 @@ class VisionGeminiTests(unittest.TestCase):
                     def __exit__(self,*a): pass
                     def read(self,n=-1): return b'{"candidates":[{"content":{"parts":[{"text":"A test image"}]}}]}'
                 return Response()
-        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_VISION_MODEL":"gemini-2.5-flash"},clear=True),patch("tara_vision.__main__.build_opener",return_value=Fake()):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_VISION_MODEL":"gemini-3.8-flash"},clear=True),patch("tara_vision.__main__.build_opener",return_value=Fake()):
             r=handle_vision({"schema_version":"1.0","request_id":"v","module":"vision","action":"analyze","inputs":{"question":"Describe","images":[png]}})
         self.assertEqual(r["status"],"success");self.assertEqual(r["data"]["provider"],"gemini")
         self.assertTrue(r["data"]["images_sent_to_remote"])
