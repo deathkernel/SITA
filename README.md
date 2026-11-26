@@ -2,7 +2,7 @@
 
 ![SITA brand mark](frontend/public/sita-mark.svg)
 
-**SITA is the user-facing AI assistant/application, not an AI model.** SITA owns conversations, specialist capabilities, memory, permissions, and local desktop actions. Gemini API is the only language-model gateway: it selects the underlying provider/model and returns inference results to SITA.
+**SITA is the user-facing AI assistant/application, not an AI model.** SITA owns conversations, specialist capabilities, memory, permissions, and local desktop actions. SITA calls Google's Gemini Developer API directly using a configured Gemini model ID.
 
 Chat, Code, Handler, Router, and the other specialist capabilities are maintained as components inside this `SITA` repository. The app must not depend on deleted sibling model repositories or private cross-repository imports. Chat is a conversation runtime, Code is a coding specialist, and Handler is a deterministic native developer-environment tool; these are not all individual AI models. Actual model inventory and runtime support must be discovered/configured explicitly.
 
@@ -13,7 +13,7 @@ Chat, Code, Handler, Router, and the other specialist capabilities are maintaine
 - One app and unified UI for the SITA ecosystem.
 - Multiple model profiles selectable by task, with model/runtime lifecycle management.
 - Chat, coding, and environment-management workflows integrated as specialist capabilities.
-- One consistent Gemini Developer API for all language-model inference; SITA does not directly call Ollama, Gemini, or another model provider.
+- One direct Gemini Developer API integration for language-model inference; OmniRoute and Ollama are not used as inference backends.
 - SITA chooses a configured Gemini model ID; Google's API manages hosted inference, quota, and model availability.
 - Clear distinction between an AI model, a model runtime/provider, and a tool/engine.
 - Safe defaults: no arbitrary host command execution, no hidden mutation, and no automatic Git merge.
@@ -37,7 +37,7 @@ SITA is being consolidated as a single Python monorepo. The current integrated s
 - `tara_data`: deterministic, read-only CSV summaries.
 - `tara_study`: optional local-first study notes, fill-in-the-blank quizzes, flashcards, and bounded revision plans.
 - `tara_weather`: public Open-Meteo geocoding and weather forecasts, with attribution.
-- `tara_models`: an Gemini API model catalogue and inference adapter.
+- `tara_models`: a Gemini model catalogue and inference adapter.
 
 SITA Handler's C++17 source is included in SITA. The launchers explicitly prepare its optional native diagnostic before starting the app; only the environment-diagnosis command is exposed. If CMake or a C++ compiler is unavailable, the app uses read-only Python diagnostics. GitHub issue creation remains inactive until local credentials and a repository allowlist are configured.
 
@@ -52,10 +52,10 @@ SITA (one application)
   |
   +-- UI / sessions / settings / model catalogue
   |
-  +-- Gemini Developer API / Model Router
-  |     +-- Only language-model inference path
-  |     +-- Model/route catalogue exposed by Gemini API
-  |     +-- Provider selection, fallback, quotas and model lifecycle managed by Gemini API
+  +-- Google Gemini Developer API
+  |     +-- Direct model inference using configured Gemini model IDs
+  |     +-- Model catalogue filtered for generateContent support
+  |     +-- API project manages access and quota; SITA owns specialist/model selection
   |
   +-- Task Orchestrator / Capability Registry
         +-- SITA Chat adapter --> conversation + memory
@@ -113,26 +113,27 @@ This layout is a target, not a claim that those modules are already implemented.
 See [runtime and development option notes](docs/runtime-evaluation.md) for the current scope of Amp, GitHub Copilot sandboxing, GitHub Package Firewall, and AWS TorchNeuron. These are optional references, not built-in SITA runtimes. The [native Handler integration notes](docs/native-handler.md) describe its explicit build step and read-only app boundary.
 
 
-## Gemini API-only AI inference
+## Gemini Developer API configuration
 
-All SITA language-model requests use the Google Gemini Developer API. This includes Chat, Code, Vision, Creative, and Model Hub. SITA's own specialist router still decides which capability handles a task; SITA chooses the Gemini model ID and the Gemini API performs hosted inference for that inference request.
+SITA uses Google's Gemini Developer API directly for Chat, Code, Vision, Creative, and Model Hub. SITA's local router selects the specialist; each specialist sends a bounded request to its configured Gemini model. The default model is `gemini-3.8-flash`, and each specialist can override it in `[gemini.models]` or through its model environment variable.
 
-- **Gateway:** `http://127.0.0.1:20128/v1`
-- **Chat route:** `auto`
-- **Code route:** `auto/coding:cheap`
-- **Vision route:** `auto` (must resolve to a vision-capable model)
-- **Creative route:** `auto/cheap`
-- **Model Hub route:** `auto`
-- **Authentication:** set `GEMINI_API_KEY` in the process environment. Never commit the key or place it in frontend configuration.
-- **No local fallback:** if Gemini API or its API key is unavailable, the affected inference request fails closed. SITA does not silently fall back to Ollama or another provider.
+Copy `sita.example.toml` to `sita.toml`. Set the API key in the same PowerShell session that launches SITA:
 
-The route aliases are passed to Gemini API; they are not concrete model IDs. Provider availability, model IDs, quotas, billing, and fallback behavior depend on the connected providers and routing policy configured inside Gemini API.
+```powershell
+$env:GEMINI_API_KEY = Read-Host "Gemini API key"
+```
 
-**Data handling:** Chat prompts, recent history and relevant saved-memory snippets, creative briefs, and any explicitly supplied code attachments or images are sent to Gemini API and are sent to Google's Gemini service. Chat, Code, Vision, Creative, and Model Hub each require `allow_remote = true` in `sita.toml`; otherwise that specialist stays disabled. Do not send secrets or confidential workspace data unless you have reviewed the selected provider and consent to that transfer. Vision reports `images_sent_to_remote=true`. SITA keeps memory, permissions, capability routing, and desktop tool execution on the local machine; model output is never executed as a host command.
+The key is sent in the `x-goog-api-key` HTTP header; it is never stored in `sita.toml`, source code, frontend configuration, prompts, or logs. Do not commit the key. The launcher does not require a local model gateway.
 
-Local speech transcription via optional faster-whisper and browser read-aloud are separate speech features, not language-model fallback paths. They remain local when enabled.
+- **Model catalogue:** `GET https://generativelanguage.googleapis.com/v1beta/models`.
+- **Text and multimodal inference:** `POST /v1beta/models/{model}:generateContent`.
+- **Default model:** `gemini-3.8-flash` (configurable per specialist).
+- **No silent fallback:** unavailable keys, models, quotas, or API connectivity cause the affected request to fail closed; SITA does not switch to OmniRoute or Ollama.
+- **Remote data consent:** each model-driven specialist remains subject to `allow_remote = true` in `sita.toml`. Chat prompts/history/memory excerpts, Code attachments, Creative briefs, and Vision images are sent to Google's service only when that specialist is enabled.
 
-See [Gemini API integration setup](docs/OMNIROUTE_INTEGRATION.md) for Windows configuration and troubleshooting.
+Review Google's current model availability, API terms, data handling, quotas, and billing before sending sensitive content. Do not send secrets or confidential workspace data unless you have explicitly accepted that transfer. SITA keeps local memory, permissions, capability routing, and desktop tool execution on the user's machine; model output is untrusted data and is never executed as a host command.
+
+See [Gemini API integration setup](docs/GEMINI_INTEGRATION.md) for Windows configuration and troubleshooting.
 
 ### Web UI selection
 
@@ -140,7 +141,7 @@ The premium React + TypeScript workspace is the primary UI when compiled assets 
 
 The React workspace includes session navigation and search, specialist task starters, session export/delete, drag-and-drop and picker attachments, selected skill packs, scoped approval cards, message edit/regenerate/copy, local read-aloud, activity history, runtime/model status, and the read-only MCP integration catalogue. Its premium motion system uses restrained button sheen, hover elevation, status feedback and panel/message transitions; it respects the operating system's reduced-motion preference and adds no remote font or animation dependency. Its multi-pane layout is inspired by modern coding-agent workspaces; it does not pretend to provide shell execution, arbitrary file editing, diff application, or preview panes. Those remain unavailable until their backend and security boundaries exist.
 
-See [Premium Developer Workspace](docs/PREMIUM_WORKSPACE_UI.md) for the design system, motion rules, feature boundaries, build behavior, and acceptance requirements. Language-model prompts and supported attachments still travel through Google's Gemini Developer API and may reach the providers configured there; local browser read-aloud uses installed local voices.
+See [Premium Developer Workspace](docs/PREMIUM_WORKSPACE_UI.md) for the design system, motion rules, feature boundaries, build behavior, and acceptance requirements. Language-model prompts and supported attachments travel to Google's Gemini Developer API; local browser read-aloud uses installed local voices.
 
 ### Chat experience
 
@@ -150,7 +151,7 @@ Research uses Crossref and Wikipedia public APIs for source records. No API key 
 
 ## Target integration contracts
 
-Adapters should expose health, capabilities, and a structured execute operation. SITA queries Gemini API for the model catalogue and delegates provider/model selection and lifecycle to the gateway. SITA adapters still enforce request bounds, cancellation, timeouts, local permission checks, and audit reporting. Model identity and route should be recorded for each inference request.
+Adapters should expose health, capabilities, and a structured execute operation. SITA queries Google's model catalogue, selects the configured Gemini model ID for the specialist, and sends requests directly to that model. SITA adapters still enforce request bounds, cancellation, timeouts, local permission checks, and audit reporting. Model identity and specialist should be recorded for each inference request.
 
 Use a versioned request with `schema_version`, `request_id`, `session_id`, `module`, `action`, structured `inputs`, `workspace_root` when applicable, `timeout_seconds`, and `approval_token` when a mutating operation requires approval.
 
@@ -177,7 +178,7 @@ SITA now includes the local Router, Chat, Code, Planner, Memory, Creative, Secur
 3. Set `$env:GEMINI_API_KEY = Read-Host 'Gemini API key'` in PowerShell.
 4. Run `.\run-sita.bat` in that same PowerShell window.
 
-The launcher creates a local virtual environment, installs this repository, creates `sita.toml` from the example when needed, prepares the optional native Handler diagnostic, and starts SITA. SITA does not install, start, or call Ollama for language-model inference; the configured Gemini Developer API handles model routing.
+The launcher creates a local virtual environment, installs this repository, creates `sita.toml` from the example when needed, prepares the optional native Handler diagnostic, and starts SITA. SITA does not install, start, or call Ollama for language-model inference; the configured Gemini model handles hosted inference.
 
 
 ### Run on macOS or Linux
@@ -187,7 +188,7 @@ The launcher creates a local virtual environment, installs this repository, crea
 3. Export `GEMINI_API_KEY` in the shell environment.
 4. Run `./run-sita.sh` from the repository folder.
 
-The script creates a virtual environment, installs SITA, initializes the local config, explicitly prepares the optional native Handler diagnostic, and starts the app. If a local CMake/C++ toolchain is missing, Handler keeps working through the read-only Python fallback. All language-model requests still go through Google's Gemini Developer API.
+The script creates a virtual environment, installs SITA, initializes the local config, explicitly prepares the optional native Handler diagnostic, and starts the app. If a local CMake/C++ toolchain is missing, Handler keeps working through the read-only Python fallback. All language-model requests are sent directly to Google's Gemini Developer API.
 
 ### Run from a terminal
 
@@ -208,7 +209,7 @@ If installation previously stopped with `No matching distributions found for onn
 
 ### Consolidation status
 
-The consolidated Router, Chat, Code, Planner, Memory, Creative, Security, Action, Data, Vision, Voice, and Research packages are maintained in this repository. The native Handler source and on-demand adapter are included; the app exposes only environment diagnosis. GitHub issue creation requires local credentials, a repo allowlist, Security review, and one-time user approval. Gemini Developer API connectivity and provider routing still need an end-to-end smoke test on the target computer.
+The consolidated Router, Chat, Code, Planner, Memory, Creative, Security, Action, Data, Vision, Voice, and Research packages are maintained in this repository. The native Handler source and on-demand adapter are included; the app exposes only environment diagnosis. GitHub issue creation requires local credentials, a repo allowlist, Security review, and one-time user approval. Gemini Developer API connectivity and inference needs an end-to-end smoke test on the target computer.
 
 
 ## Study Mode (free and local-first)
@@ -224,27 +225,27 @@ SITA includes an optional, read-only Study specialist for source-grounded notes,
 The first release intentionally avoids pretending deterministic sentence extraction is a full AI tutor. More advanced subject explanations, real MCQ distractors, spaced repetition, OCR, semantic search, and study progress tracking are follow-up batches.
 
 
-## Gemini API Model Hub and Weather
+## Gemini Model Hub and Weather
 
-- **Model catalogue:** SITA Model Hub reads the available model list from Gemini API's `GET /v1/models` endpoint.
-- **Model generation:** Model Hub prompts use Gemini API's `POST /v1/chat/completions` endpoint. A selected model ID or configured route alias is sent through the gateway.
-- **No direct provider access:** SITA Model Hub no longer calls Gemini APIs or local Ollama endpoints. Model availability, cost, quotas, and access depend on Gemini API's connected providers.
-- **Example prompts:** ask `List available models`, or `Use provider/model-id: explain photosynthesis`.
+- **Model catalogue:** SITA Model Hub reads models from Google's `GET /v1beta/models` endpoint and shows entries that support `generateContent`.
+- **Model generation:** Model Hub sends requests to `POST /v1beta/models/{model}:generateContent` using the selected Gemini model ID.
+- **Availability:** visible models and quota depend on the Gemini API project and key. SITA does not use provider aliases or a separate model gateway.
+- **Example prompts:** ask `List available models`, or `Use model gemini-3.8-flash: explain photosynthesis`.
 - **Weather:** ask `weather in Pune` or `forecast for London for the next 7 days`. SITA uses Open-Meteo's public geocoding and forecast APIs without an API key, includes attribution, and limits response size and network timeouts. Its free endpoint is for non-commercial use and subject to provider rate limits.
 - **Readable answers:** SITA normalizes excessive whitespace and bullet glyphs and uses wider answer cards, consistent line spacing, and clearer heading hierarchy.
 
-### Configure Gemini API (PowerShell)
+### Configure the Gemini API (PowerShell)
 
-1. Start Gemini API and confirm its local gateway is reachable at `http://127.0.0.1:20128`.
+1. Copy `sita.example.toml` to `sita.toml`.
 2. In the same PowerShell window used to start SITA, set `$env:GEMINI_API_KEY = Read-Host "Gemini API key"`.
-3. Start SITA normally. The example config selects `auto` for Chat, `auto/coding:cheap` for Code, `auto` for Vision, and `auto/cheap` for Creative.
-4. Check `GET /v1/models` through Google's Gemini Developer API to inspect connected model IDs.
+3. Start SITA normally. The example config uses `gemini-3.8-flash` for Chat, Code, Vision, Creative, and Model Hub; change `[gemini.models]` to select another available Gemini model ID.
+4. Confirm connectivity in the SITA health panel or use Model Hub to list models available to the configured API key.
 
-Keep the key local and never commit it. If the gateway or key is unavailable, SITA fails closed and does not switch to Ollama or Gemini.
+Keep the key local and never commit it. No local gateway process needs to be started. If the Gemini API or key is unavailable, the affected specialist fails closed rather than switching to another provider.
 
 ## Planned integrations: Anthropic ecosystem & MCP
 
-SITA remains a **local app shell**. Language-model inference stays on Gemini API. The following official Anthropic and Model Context Protocol repositories are reference sources for making specialists more capable **without** giving the model unrestricted host control.
+SITA remains a **local app shell**. Language-model inference uses Google's Gemini Developer API directly. The following official Anthropic and Model Context Protocol repositories are reference sources for making specialists more capable **without** giving the model unrestricted host control.
 
 These are **not** vendored into SITA yet. Integration is planned in safety-first order. Patterns are adopted; full products (for example Claude Code on the host desktop) are not.
 
@@ -254,7 +255,7 @@ These are **not** vendored into SITA yet. Integration is planned in safety-first
 |----------|------------|--------------|
 | 1 | [modelcontextprotocol/python-sdk](https://github.com/modelcontextprotocol/python-sdk) | Official MCP Python client/server SDK. Basis for exposing SITA specialists as standard tools/resources behind the existing approval gate. |
 | 1 | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) | Reference MCP servers: scoped **filesystem**, **git**, **fetch**, **memory**, **time**. Patterns for allowlisted, bounded tools only. |
-| 2 | [anthropics/anthropic-sdk-python](https://github.com/anthropics/anthropic-sdk-python) | Official Claude API client, tool runner, and MCP helpers. Optional Claude path remains through Google's Gemini Developer API (or explicit config); never bypass local policy. |
+| 2 | [anthropics/anthropic-sdk-python](https://github.com/anthropics/anthropic-sdk-python) | Official Claude API client, tool runner, and MCP helpers. Claude is not an active inference backend in this configuration; any future provider integration must preserve the same local policy and approval boundary. |
 | 2 | [anthropics/claude-agent-sdk-python](https://github.com/anthropics/claude-agent-sdk-python) | Agent loop, in-process MCP tools, and hooks. Reference for multi-step Code/Planner flows; proposals stay data-only until approved. |
 | 3 | [anthropics/skills](https://github.com/anthropics/skills) | Agent Skills pack format (instructions + scripts). Reusable Study/Code/Planner skill folders. |
 | 3 | [anthropics/claude-cookbooks](https://github.com/anthropics/claude-cookbooks) | Prompt, tool-use, and evaluation recipes. |
@@ -303,7 +304,7 @@ When `src/tara_app/web/react-dist/` exists, the local server serves the compiled
 
 ## Gemini API-only AI inference
 
-Chat, Code, Vision, Creative, and Model Hub all use the locally hosted Gemini Developer API for language-model inference. SITA chooses the Gemini model ID and the Gemini API performs hosted inference; SITA retains its own capability routing, conversation context, local memory, security policy, and desktop tool execution. See [Gemini API integration setup](docs/OMNIROUTE_INTEGRATION.md) for Windows configuration. The API key is supplied through the app process environment and must never be committed to the repository or placed in frontend configuration.
+Chat, Code, Vision, Creative, and Model Hub all use the locally hosted Gemini Developer API for language-model inference. SITA chooses the Gemini model ID and Google's API performs hosted inference; SITA retains its own capability routing, conversation context, local memory, security policy, and desktop tool execution. See [Gemini API integration setup](docs/GEMINI_INTEGRATION.md) for Windows configuration. The API key is supplied through the app process environment and must never be committed to the repository or placed in frontend configuration.
 
 ## Local repository audit
 
@@ -371,7 +372,7 @@ sequenceDiagram
   U->>T: Request
   T->>T: Validate remote-data setting
   alt Remote inference allowed and gateway configured
-    T->>O: Inference request and route alias
+    T->>O: Inference request and model ID
     O->>P: Provider/model selection
     P-->>O: Inference result
     O-->>T: Result
