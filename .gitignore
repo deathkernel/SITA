@@ -4,6 +4,12 @@ __pycache__/
 .pytest_cache/
 tara-app.toml
 
+# Local secrets (keep the documented template tracked)
+.env
+.env.*
+!.env.example
+sita.toml
+
 # Frontend build artifacts and dependencies
 /frontend/node_modules/
 /frontend/package-lock.json
