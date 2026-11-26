@@ -71,7 +71,7 @@ environment = ["TARA_MODELS_MODEL", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
             root = Path(directory)
             config = self._make_config(root)
             (root / ".env").write_text(
-                "GEMINI_API_KEY=dotenv-test-key\\nTARA_GEMINI_MODEL=gemini-2.5-flash\\n",
+                "GEMINI_API_KEY=dotenv-test-key\nTARA_GEMINI_MODEL=gemini-2.5-flash\n",
                 encoding="utf-8",
             )
             with patch.dict(os.environ, {}, clear=True):
