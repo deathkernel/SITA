@@ -28,12 +28,12 @@ class GeminiCodeTests(unittest.TestCase):
                 self.request=request;self.timeout=timeout
                 return Response({"candidates":[{"content":{"parts":[{"text":"Review plan"}]}}]})
         fake=Fake()
-        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_CODE_MODEL":"gemini-2.5-flash"},clear=True),patch.object(code,"_gemini_opener",return_value=fake):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_CODE_MODEL":"gemini-3.8-flash"},clear=True),patch.object(code,"_gemini_opener",return_value=fake):
             result=code.handle_request(self.request())
         self.assertEqual(result["status"],"success")
         self.assertEqual(result["data"]["provider"],"gemini")
         self.assertEqual(result["data"]["text"],"Review plan")
-        self.assertEqual(fake.request.full_url,"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
+        self.assertEqual(fake.request.full_url,"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent")
         self.assertEqual(fake.request.get_header("X-goog-api-key"),"test-key")
         body=json.loads(fake.request.data)
         self.assertIn("contents",body)
