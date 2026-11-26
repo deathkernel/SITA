@@ -126,15 +126,15 @@ def create_application(config_path: str | Path) -> Orchestrator:
         env_names = item.get("environment", [])
         if not isinstance(env_names, list) or any(not isinstance(name, str) or not _ENV_NAME.fullmatch(name) for name in env_names):
             raise RuntimeConfigurationError(f"modules[{index}].environment must contain environment variable names")
-        if module_id in _OMNIROUTE_MODULES:
-            module_environment = dict(omniroute_settings.get(module_id, {}))
+        if module_id in _GEMINI_MODULES:
+            module_environment = dict(gemini_settings.get(module_id, {}))
             module_environment.update({
                 name: os.environ[name]
                 for name in env_names
                 if name in os.environ and name not in _LEGACY_LOCAL_MODEL_ENV
             })
             if module_id == "chat":
-                module_environment["TARA_LLM_BACKEND"] = "omniroute"
+                module_environment["TARA_LLM_BACKEND"] = "gemini"
         else:
             module_environment = dict(ollama_settings.get(module_id, {}))
             module_environment.update({name: os.environ[name] for name in env_names if name in os.environ})
@@ -167,7 +167,7 @@ def create_application(config_path: str | Path) -> Orchestrator:
         )
 
     # SITA no longer starts or calls Ollama for language-model inference.
-    # Model selection and lifecycle belong to OmniRoute.
+    # Model selection and lifecycle belong to the Gemini API; local model installation is not enabled.
 
     try:
         mcp_config = parse_mcp_config(config.get("mcp"))
