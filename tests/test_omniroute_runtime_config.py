@@ -1,154 +1,84 @@
 from __future__ import annotations
-
-import os
-import tempfile
-import unittest
+import os, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
-
 from tara_app.runtime import create_application
 
 
-class OmniRouteRuntimeConfigTests(unittest.TestCase):
-    def test_all_llm_specialists_use_omniroute_and_ignore_legacy_ollama_defaults(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            config = root / "tara-app.toml"
-            config.write_text(
-                """
-[ollama]
-base_url = "http://127.0.0.1:11434"
-[ollama.models]
-chat = "llama3.2:3b"
-code = "qwen2.5-coder:3b"
-vision = "gemma3:4b"
-creative = "llama3.2:3b"
-
-[omniroute]
-base_url = "http://127.0.0.1:20128/v1"
-[omniroute.models]
-chat = "auto"
-code = "auto/coding:cheap"
-vision = "auto"
-creative = "auto/cheap"
-models = "auto"
-
+class GeminiRuntimeConfigTests(unittest.TestCase):
+    def _make_config(self, root, allow=True):
+        path=root/"sita.toml"
+        path.write_text("""
+[gemini]
+model = "gemini-2.5-flash"
+[gemini.models]
+chat = "gemini-2.5-flash"
+code = "gemini-2.5-flash"
+vision = "gemini-2.5-flash"
+creative = "gemini-2.5-flash"
+models = "gemini-2.5-flash"
 [router]
 command = ["{python}", "-c", "pass"]
 working_directory = "."
-
 [[modules]]
 id = "chat"
 allow_remote = true
 command = ["{python}", "-c", "pass"]
 working_directory = "."
-environment = ["TARA_LLM_BACKEND", "TARA_OMNIROUTE_API_KEY", "TARA_OMNIROUTE_BASE_URL", "TARA_OMNIROUTE_MODEL"]
-
+environment = ["TARA_LLM_BACKEND", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
 [[modules]]
 id = "code"
 allow_remote = true
 command = ["{python}", "-c", "pass"]
 working_directory = "."
-environment = ["TARA_CODE_API_BASE_URL", "TARA_CODE_API_KEY", "TARA_CODE_MODEL"]
-
+environment = ["TARA_CODE_MODEL", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
 [[modules]]
 id = "vision"
 allow_remote = true
 command = ["{python}", "-c", "pass"]
 working_directory = "."
-environment = ["TARA_VISION_API_BASE_URL", "TARA_VISION_API_KEY", "TARA_VISION_MODEL"]
-
+environment = ["TARA_VISION_MODEL", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
 [[modules]]
 id = "creative"
 allow_remote = true
 command = ["{python}", "-c", "pass"]
 working_directory = "."
-environment = ["TARA_CREATIVE_API_BASE_URL", "TARA_CREATIVE_API_KEY", "TARA_CREATIVE_MODEL"]
-
+environment = ["TARA_CREATIVE_MODEL", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
 [[modules]]
 id = "models"
 allow_remote = true
 command = ["{python}", "-c", "pass"]
 working_directory = "."
-environment = ["TARA_MODELS_API_BASE_URL", "TARA_MODELS_API_KEY", "TARA_MODELS_MODEL"]
-""",
-                encoding="utf-8",
-            )
-            with patch.dict(os.environ, {"TARA_OMNIROUTE_API_KEY": "test-key"}, clear=True):
-                app = create_application(config)
-
-            expected = {
-                "chat": ("TARA_OMNIROUTE_MODEL", "auto", "TARA_OMNIROUTE_API_KEY"),
-                "code": ("TARA_CODE_MODEL", "auto/coding:cheap", "TARA_CODE_API_KEY"),
-                "vision": ("TARA_VISION_MODEL", "auto", "TARA_VISION_API_KEY"),
-                "creative": ("TARA_CREATIVE_MODEL", "auto/cheap", "TARA_CREATIVE_API_KEY"),
-                "models": ("TARA_MODELS_MODEL", "auto", "TARA_MODELS_API_KEY"),
-            }
-            for module_id, (model_env, model, key_env) in expected.items():
-                environment = app.registry.adapter(module_id).environment
-                self.assertEqual(environment[model_env], model)
-                self.assertEqual(environment[key_env], "test-key")
-                self.assertFalse(any("OLLAMA" in name for name in environment))
-                self.assertFalse(any(name == "GEMINI_API_KEY" for name in environment))
-            self.assertEqual(app.registry.adapter("chat").environment["TARA_LLM_BACKEND"], "omniroute")
+environment = ["TARA_MODELS_MODEL", "TARA_GEMINI_MODEL", "GEMINI_API_KEY"]
+""",encoding="utf-8")
+        return path
+    def test_all_llm_specialists_receive_gemini_key_and_no_legacy_gateway_vars(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config=self._make_config(Path(directory))
+            with patch.dict(os.environ,{"GEMINI_API_KEY":"local-test-key","TARA_OMNIROUTE_API_KEY":"ignored","OLLAMA_HOST":"http://127.0.0.1:11434"},clear=True):
+                app=create_application(config)
+            for module in ("chat","code","vision","creative","models"):
+                env=app.registry.adapter(module).environment
+                self.assertEqual(env["GEMINI_API_KEY"],"local-test-key")
+                self.assertEqual(env["TARA_GEMINI_MODEL"],"gemini-2.5-flash")
+                self.assertFalse(any("OMNIROUTE" in k for k in env))
+                self.assertFalse(any("OLLAMA" in k for k in env))
+            self.assertEqual(app.registry.adapter("chat").environment["TARA_LLM_BACKEND"],"gemini")
             self.assertIsNone(app.model_catalog)
-
-    def test_remote_specialist_opt_in_is_reported_without_being_enabled_implicitly(self):
+    def test_remote_specialist_opt_in_stays_explicit(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            config = root / "tara-app.toml"
-            config.write_text(
-                """
-[router]
-command = ["{python}", "-c", "pass"]
-working_directory = "."
-[[modules]]
-id = "chat"
-allow_remote = false
-command = ["{python}", "-c", "pass"]
-working_directory = "."
-""",
-                encoding="utf-8",
-            )
-            with patch.dict(os.environ, {"TARA_OMNIROUTE_API_KEY": "test-key"}, clear=True):
-                app = create_application(config)
-
+            config=Path(directory)/"sita.toml"
+            config.write_text('[router]\ncommand=["{python}","-c","pass"]\nworking_directory="."\n[[modules]]\nid="chat"\nallow_remote=false\ncommand=["{python}","-c","pass"]\nworking_directory="."\n',encoding="utf-8")
+            with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key"},clear=True):
+                app=create_application(config)
             self.assertIsNone(app.registry.adapter("chat"))
-            diagnostics = app.registry.disabled_modules()
-            self.assertIn("allow_remote = true", diagnostics["chat"])
-            self.assertIn("models", diagnostics)
-
-    def test_process_environment_overrides_omniroute_route_alias(self):
+            self.assertIn("allow_remote = true",app.registry.disabled_modules()["chat"])
+    def test_environment_can_override_model_id(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            config = root / "tara-app.toml"
-            config.write_text(
-                """
-[omniroute]
-base_url = "http://127.0.0.1:20128/v1"
-[omniroute.models]
-chat = "auto"
-[router]
-command = ["{python}", "-c", "pass"]
-working_directory = "."
-[[modules]]
-id = "chat"
-allow_remote = true
-command = ["{python}", "-c", "pass"]
-working_directory = "."
-environment = ["TARA_OMNIROUTE_MODEL", "TARA_OMNIROUTE_API_KEY"]
-""",
-                encoding="utf-8",
-            )
-            with patch.dict(os.environ, {
-                "TARA_OMNIROUTE_API_KEY": "test-key",
-                "TARA_OMNIROUTE_MODEL": "auto/fast",
-            }, clear=True):
-                app = create_application(config)
-            environment = app.registry.adapter("chat").environment
-            self.assertEqual(environment["TARA_OMNIROUTE_MODEL"], "auto/fast")
-            self.assertEqual(environment["TARA_LLM_BACKEND"], "omniroute")
+            config=self._make_config(Path(directory))
+            with patch.dict(os.environ,{"GEMINI_API_KEY":"key","TARA_GEMINI_MODEL":"gemini-2.5-pro"},clear=True):
+                app=create_application(config)
+            self.assertEqual(app.registry.adapter("chat").environment["TARA_GEMINI_MODEL"],"gemini-2.5-pro")
 
 
-if __name__ == "__main__":
-    unittest.main()
+if __name__=="__main__": unittest.main()
