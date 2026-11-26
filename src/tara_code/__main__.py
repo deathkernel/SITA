@@ -190,40 +190,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())    try:
-        body=_gemini_request("https://generativelanguage.googleapis.com/v1beta/models/"+quote(model,safe="")+":generateContent",api_key,payload)
-    except RuntimeError as exc:
-        return _result(request_id,"unavailable",error=str(exc),duration_ms=int((time.monotonic()-started)*1000))
-    candidates=body.get("candidates",[])
-    first=candidates[0] if isinstance(candidates,list) and candidates else None
-    content=first.get("content") if isinstance(first,Mapping) else None
-    parts=content.get("parts",[]) if isinstance(content,Mapping) else []
-    text="\n".join(part.get("text","") for part in parts if isinstance(part,Mapping) and isinstance(part.get("text"),str)).strip()
-    if not text or len(text)>MAX_RESPONSE_BYTES:
-        return _result(request_id,"failed",error="Gemini returned an invalid coding response",duration_ms=int((time.monotonic()-started)*1000))
-    return _result(request_id, "success", {
-        "text": text,
-        "model": response_model,
-        "provider": "gemini",
-        "execution_performed": False,
-        "remote_data_transfer": True,
-    }, duration_ms=int((time.monotonic() - started) * 1000))
-
-
-def main() -> int:
-    raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
-    if len(raw) > MAX_REQUEST_BYTES:
-        result = _result("unknown", "invalid_request", error="request exceeds the size limit")
-    else:
-        try:
-            request = json.loads(raw.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError):
-            result = _result("unknown", "invalid_request", error="request must be UTF-8 JSON")
-        else:
-            result = handle_request(request)
-    sys.stdout.write(json.dumps(result, ensure_ascii=False, separators=(",", ":"), allow_nan=False) + "\n")
-    return 0
-
-
-if __name__ == "__main__":
     raise SystemExit(main())
