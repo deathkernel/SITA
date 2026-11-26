@@ -36,10 +36,10 @@ _POLICIES: dict[str, tuple[Capability, ...]] = {
     "study": (Capability("study", "create", "Create source-grounded study notes, quizzes and flashcards or a bounded revision plan", True),),
     "weather": (Capability("weather", "forecast", "Fetch current conditions and short forecasts from public Open-Meteo endpoints", True),),
     "models": (
-        Capability("models", "catalog", "Discover models exposed by the configured OmniRoute gateway", True),
-        Capability("models", "generate", "Generate an answer through the configured OmniRoute gateway", True),
+        Capability("models", "catalog", "Discover Gemini models exposed to the configured API key", True),
+        Capability("models", "generate", "Generate an answer through the configured Gemini model", True),
     ),
-    "creative": (Capability("creative", "write", "Generate writing through OmniRoute", True),),
+    "creative": (Capability("creative", "write", "Generate writing through Gemini", True),),
     "voice": (
         Capability("voice", "transcribe", "Transcribe user supplied audio", True),
         Capability("voice", "speak", "Synthesize speech from text", True),
