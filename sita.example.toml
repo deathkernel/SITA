@@ -1,5 +1,5 @@
 # SITA configuration template. Copy to sita.toml and adjust only local settings.
-# TARA_* environment variable names remain supported for compatibility.
+# Gemini model IDs are configured in [gemini.models]; the API key is supplied via GEMINI_API_KEY.
 # All SITA language-model inference uses the Google Gemini Developer API.
 # Set GEMINI_API_KEY in the process environment; never put it in this file.
 
@@ -117,7 +117,7 @@ timeout_seconds = 30
 
 [[modules]]
 id = "creative"
-allow_remote = true # Sends the creative brief through OmniRoute.
+allow_remote = true # Sends the creative brief to Gemini.
 command = ["{python}", "-m", "tara_creative"]
 working_directory = "."
 timeout_seconds = 180
@@ -164,5 +164,5 @@ id = "models"
 command = ["{python}", "-m", "tara_models"]
 working_directory = "."
 timeout_seconds = 180
-allow_remote = true # Model discovery and generation use the configured OmniRoute gateway.
+allow_remote = true # Model discovery and generation use the Gemini Developer API.
 environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_MODELS_MODEL"]
