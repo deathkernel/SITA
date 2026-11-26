@@ -304,13 +304,13 @@ When `src/tara_app/web/react-dist/` exists, the local server serves the compiled
 
 ## Gemini API-only AI inference
 
-Chat, Code, Vision, Creative, and Model Hub all use the locally hosted Gemini Developer API for language-model inference. SITA chooses the Gemini model ID and Google's API performs hosted inference; SITA retains its own capability routing, conversation context, local memory, security policy, and desktop tool execution. See [Gemini API integration setup](docs/GEMINI_INTEGRATION.md) for Windows configuration. The API key is supplied through the app process environment and must never be committed to the repository or placed in frontend configuration.
+Chat, Code, Vision, Creative, and Model Hub call Google's hosted Gemini Developer API directly for language-model inference. SITA chooses the Gemini model ID and Google's API performs hosted inference; SITA retains its own capability routing, conversation context, local memory, security policy, and desktop tool execution. See [Gemini API integration setup](docs/GEMINI_INTEGRATION.md) for Windows configuration. The API key is supplied through the app process environment and must never be committed to the repository or placed in frontend configuration.
 
 ## Local repository audit
 
 SITA exposes a read-only repository audit through its local Chat capability. In the app, ask **"Audit this repository"** or **"Check this project"**. The deterministic Router selects `chat.audit_repository`; the Chat adapter scans its configured working directory (the example configuration uses the repository root). The operation does not initialize an LLM, execute shell commands, accept file attachments, modify files, or upload repository content.
 
-The interactive SITA Chat CLI also supports an explicit local command. From the repository folder, start `python -m tara_chat` and enter `/audit`. This read-only command does not require an Gemini API key or initialize a model; ordinary chat replies still require a configured Gemini Developer API.
+The interactive SITA Chat CLI also supports an explicit local command. From the repository folder, start `python -m tara_chat` and enter `/audit`. This read-only command does not require a Gemini API key or initialize a model; ordinary chat replies still require a configured Gemini Developer API.
 
 ```text
 /audit
@@ -332,8 +332,8 @@ flowchart LR
   User[User] --> UI[SITA Web UI]
   UI --> App[SITA / Orchestrator]
   App --> Specialists[Local specialist capabilities]
-  App --> Gateway[Gemini Developer API]
-  Gateway --> Providers[Configured model providers]
+  App --> Gemini[Google Gemini Developer API]
+  Gemini --> Model[Configured Gemini model]
   App --> SQLite[(Local SQLite memory)]
   App --> Security[SITA Security / approvals]
   Security --> Tools[Allowlisted desktop and browser actions]
@@ -361,21 +361,18 @@ flowchart TB
   Memory --> Security
 ```
 
-### 3. Inference routing — Gemini API-only boundary
+### 3. Inference routing — direct Gemini API boundary
 
 ```mermaid
 sequenceDiagram
   participant U as User
   participant T as SITA specialist
-  participant O as Gemini API
-  participant P as Configured provider
+  participant G as Google Gemini Developer API
   U->>T: Request
   T->>T: Validate remote-data setting
-  alt Remote inference allowed and gateway configured
-    T->>O: Inference request and model ID
-    O->>P: Provider/model selection
-    P-->>O: Inference result
-    O-->>T: Result
+  alt Remote inference allowed and Gemini API key/model available
+    T->>G: generateContent request with configured model ID
+    G-->>T: Inference result
     T-->>U: Response
   else Not allowed or unavailable
     T-->>U: Fail closed with error
