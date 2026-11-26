@@ -54,7 +54,7 @@ def _gemini_generate(model: str, api_key: str, payload: dict[str, Any]) -> dict[
     candidates=body.get("candidates",[]); first=candidates[0] if isinstance(candidates,list) and candidates else None
     content=first.get("content") if isinstance(first,Mapping) else None
     parts=content.get("parts",[]) if isinstance(content,Mapping) else []
-    text="\\n".join(part.get("text","") for part in parts if isinstance(part,Mapping) and isinstance(part.get("text"),str)).strip()
+    text="\n".join(part.get("text","") for part in parts if isinstance(part,Mapping) and isinstance(part.get("text"),str)).strip()
     if not text: raise RuntimeError("Gemini returned no vision analysis")
     return {"text":text,"model":model}
 
