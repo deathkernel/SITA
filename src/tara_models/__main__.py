@@ -11,7 +11,7 @@ _MODEL_RE=re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 def _provider(model: str|None=None) -> GeminiProvider:
     api_key=os.environ.get("GEMINI_API_KEY","")
-    selected=model or os.environ.get("TARA_MODELS_MODEL",os.environ.get("TARA_GEMINI_MODEL","gemini-2.5-flash"))
+    selected=model or os.environ.get("TARA_MODELS_MODEL",os.environ.get("TARA_GEMINI_MODEL","gemini-3.8-flash"))
     if not isinstance(selected,str) or not _MODEL_RE.fullmatch(selected):
         raise ValueError("Gemini model ID is invalid")
     return GeminiProvider(api_key=api_key,model=selected)
