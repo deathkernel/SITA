@@ -73,9 +73,9 @@ class ApplicationFacade:
             "api_version": "1.0",
             "capability_count": len(capabilities),
             "capabilities": list(capabilities),
-            "model_runtime": "omniroute",
+            "model_runtime": "gemini",
             "specialists": specialists,
-            "model_gateway": {"provider": "omniroute", "status": gateway_status},
+            "model_gateway": {"provider": "gemini", "status": gateway_status},
         }
 
     def skill_catalogue(self) -> dict[str, Any]:
@@ -102,10 +102,10 @@ class ApplicationFacade:
         if adapter is None:
             return {
                 "status": "unavailable",
-                "provider": "omniroute",
+                "provider": "gemini",
                 "service_available": False,
                 "models": [],
-                "pull": {"status": "disabled", "message": "Model lifecycle is managed by OmniRoute."},
+                "pull": {"status": "disabled", "message": "Model lifecycle is managed by Gemini."},
             }
         request = ModuleRequest(
             request_id="tara-model-catalog",
@@ -122,21 +122,21 @@ class ApplicationFacade:
         if result is None or result.status != "success":
             return {
                 "status": "unavailable",
-                "provider": "omniroute",
+                "provider": "gemini",
                 "service_available": False,
                 "models": [],
-                "error": "OmniRoute model catalogue is unavailable",
-                "pull": {"status": "disabled", "message": "Model lifecycle is managed by OmniRoute."},
+                "error": "Gemini model catalogue is unavailable",
+                "pull": {"status": "disabled", "message": "Model lifecycle is managed by Gemini."},
             }
         models = result.data.get("models", []) if isinstance(result.data, Mapping) else []
         if not isinstance(models, list):
             models = []
         return {
             "status": "available",
-            "provider": "omniroute",
+            "provider": "gemini",
             "service_available": True,
             "models": models,
-            "pull": {"status": "disabled", "message": "Model lifecycle is managed by OmniRoute."},
+            "pull": {"status": "disabled", "message": "Model lifecycle is managed by Gemini."},
         }
 
     def model_lifecycle_action(self, action: str, specialist: str) -> dict[str, Any] | None:
@@ -248,7 +248,7 @@ class ApplicationFacade:
                 "status": specialist["status"],
             })
         components.append({
-            "name": "OmniRoute Gateway",
+            "name": "Gemini Gateway",
             "type": "Model Gateway",
             "status": health["model_gateway"]["status"],
         })
