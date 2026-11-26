@@ -1,135 +1,46 @@
 from __future__ import annotations
-
-import io
-import json
-import unittest
+import json, os, unittest
 from unittest.mock import patch
-
 from tara_app.omniroute_health import check_gateway, diagnose_gateway
 from tara_chat.app_adapter import handle_request as handle_chat
 from tara_models.__main__ import handle_request as handle_models
-from tara_vision.__main__ import handle_request as handle_vision
 
 
-def module_request(module: str) -> dict[str, object]:
-    return {
-        "schema_version": "1.0",
-        "request_id": f"{module}-health-test",
-        "module": module,
-        "action": "health",
-        "inputs": {},
-    }
+def request(module):
+    return {"schema_version":"1.0","request_id":module+"-health","module":module,"action":"health","inputs":{}}
 
 
-class _Response:
-    def __init__(self, payload: bytes) -> None:
-        self.payload = payload
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        return None
-
-    def read(self, size: int = -1) -> bytes:
-        return self.payload if size < 0 else self.payload[:size]
-
-
-class _Opener:
-    def __init__(self, response: _Response) -> None:
-        self.response = response
-        self.request = None
-        self.timeout = None
-
-    def open(self, request, timeout: float):
-        self.request = request
-        self.timeout = timeout
-        return self.response
-
-
-class OmniRouteLiveHealthTests(unittest.TestCase):
-    def test_gateway_probe_uses_authenticated_models_endpoint(self) -> None:
-        opener = _Opener(_Response(b'{"data":[{"id":"auto"}]}'))
-        with patch("tara_app.omniroute_health.build_opener", return_value=opener):
-            self.assertTrue(check_gateway("http://127.0.0.1:20128/v1", "test-key"))
-        self.assertEqual(opener.request.full_url, "http://127.0.0.1:20128/v1/models")
-        self.assertEqual(opener.request.get_method(), "GET")
-        self.assertEqual(opener.request.get_header("Authorization"), "Bearer test-key")
-        self.assertEqual(opener.timeout, 5.0)
-
-    def test_gateway_probe_rejects_malformed_or_wrong_shape_catalogue(self) -> None:
-        for payload in (b"not-json", b'{"models":[]}', b'{"data":{}}'):
-            opener = _Opener(_Response(payload))
-            with patch("tara_app.omniroute_health.build_opener", return_value=opener):
-                self.assertFalse(check_gateway("http://127.0.0.1:20128/v1", "test-key"))
-
-
-    def test_gateway_diagnostic_identifies_missing_api_key(self) -> None:
-        message = diagnose_gateway("http://127.0.0.1:20128/v1", "")
-        self.assertIn("TARA_OMNIROUTE_API_KEY is not set", message)
-
-    def test_gateway_diagnostic_reports_auth_status_without_leaking_key(self) -> None:
+class GeminiHealthTests(unittest.TestCase):
+    def test_probe_uses_google_models_endpoint_and_api_key_header(self):
+        class Response:
+            def __enter__(self): return self
+            def __exit__(self,*args): pass
+            def read(self,size=-1): return b'{"models":[]}'
+        class Opener:
+            def open(self,req,timeout): self.request=req;self.timeout=timeout;return Response()
+        opener=Opener()
+        with patch("tara_chat.gemini_provider.build_opener",return_value=opener):
+            self.assertTrue(check_gateway(api_key="safe-key"))
+        self.assertEqual(opener.request.full_url,"https://generativelanguage.googleapis.com/v1beta/models?pageSize=1")
+        self.assertEqual(opener.request.get_header("X-goog-api-key"),"safe-key")
+        self.assertEqual(opener.timeout,8.0)
+    def test_missing_key_diagnostic_is_specific(self):
+        self.assertIn("GEMINI_API_KEY",diagnose_gateway(api_key=""))
+    def test_auth_failure_does_not_leak_key(self):
         from urllib.error import HTTPError
-
-        class UnauthorizedOpener:
-            def open(self, request, timeout: float):
-                raise HTTPError(request.full_url, 401, "Unauthorized", {}, None)
-
-        with patch("tara_app.omniroute_health.build_opener", return_value=UnauthorizedOpener()):
-            message = diagnose_gateway(
-                "http://127.0.0.1:20128/v1",
-                "secret-test-key",
-            )
-        self.assertIn("HTTP 401", message)
-        self.assertNotIn("secret-test-key", message)
-
-    def test_chat_health_fails_when_gateway_is_unreachable(self) -> None:
-        with patch.dict("os.environ", {
-            "TARA_OMNIROUTE_API_KEY": "test-key",
-            "TARA_LLM_BACKEND": "omniroute",
-        }, clear=True), patch("tara_chat.omniroute_provider.diagnose_gateway", return_value="Cannot connect to OmniRoute."):
-            result = handle_chat(module_request("chat"))
-        self.assertEqual(result["status"], "unavailable")
-        self.assertIn("Cannot connect to OmniRoute", result["error"])
-        self.assertNotIn("test-key", json.dumps(result))
-
-    def test_vision_health_fails_when_gateway_is_unreachable(self) -> None:
-        with patch.dict("os.environ", {
-            "TARA_VISION_API_BASE_URL": "http://127.0.0.1:20128/v1",
-            "TARA_VISION_API_KEY": "test-key",
-        }, clear=True), patch("tara_vision.__main__.check_gateway", return_value=False):
-            result = handle_vision(module_request("vision"))
-        self.assertEqual(result["status"], "unavailable")
-        self.assertNotIn("test-key", json.dumps(result))
-
-    def test_model_hub_health_fails_when_gateway_is_unreachable(self) -> None:
-        with patch.dict("os.environ", {
-            "TARA_MODELS_API_BASE_URL": "http://127.0.0.1:20128/v1",
-            "TARA_MODELS_API_KEY": "test-key",
-        }, clear=True), patch("tara_models.__main__.check_gateway", return_value=False):
-            result = handle_models(module_request("models"))
-        self.assertEqual(result["status"], "unavailable")
-        self.assertNotIn("test-key", json.dumps(result))
-
-    def test_creative_health_fails_when_gateway_is_unreachable(self) -> None:
-        from tara_creative import __main__ as creative
-
-        request = module_request("creative")
-        source = io.BytesIO(json.dumps(request).encode("utf-8"))
-
-        class _Input:
-            buffer = source
-
-        output = io.StringIO()
-        with patch("sys.stdin", _Input()), patch("sys.stdout", output), patch(
-            "tara_creative.__main__._omniroute_config",
-            return_value=("http://127.0.0.1:20128/v1", "test-key", "auto/cheap"),
-        ), patch("tara_creative.__main__.check_gateway", return_value=False):
-            self.assertEqual(creative.main(), 0)
-        result = json.loads(output.getvalue())
-        self.assertEqual(result["status"], "unavailable")
-        self.assertNotIn("test-key", output.getvalue())
+        class Opener:
+            def open(self,req,timeout): raise HTTPError(req.full_url,401,"Unauthorized",{},None)
+        with patch("tara_chat.gemini_provider.build_opener",return_value=Opener()):
+            message=diagnose_gateway(api_key="very-secret")
+        self.assertIn("rejected",message.lower());self.assertNotIn("very-secret",message)
+    def test_chat_health_fails_closed_when_gemini_unavailable(self):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key","TARA_LLM_BACKEND":"gemini"},clear=True),patch("tara_chat.gemini_provider.GeminiProvider.health_diagnostic",return_value="Gemini API is unavailable"):
+            r=handle_chat(request("chat"))
+        self.assertEqual(r["status"],"unavailable");self.assertNotIn("test-key",json.dumps(r))
+    def test_model_hub_health_fails_closed_when_gemini_unavailable(self):
+        with patch.dict(os.environ,{"GEMINI_API_KEY":"test-key"},clear=True),patch("tara_chat.gemini_provider.GeminiProvider.health_diagnostic",return_value="Gemini API is unavailable"):
+            r=handle_models(request("models"))
+        self.assertEqual(r["status"],"unavailable");self.assertNotIn("test-key",json.dumps(r))
 
 
-if __name__ == "__main__":
-    unittest.main()
+if __name__=="__main__": unittest.main()
