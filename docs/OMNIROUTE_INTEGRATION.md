@@ -1,87 +1,52 @@
-# OmniRoute-only AI integration
+# Gemini Developer API integration
 
-SITA uses OmniRoute as its **only language-model gateway**. SITA's specialist router decides whether a request belongs to Chat, Code, Vision, Creative, or Model Hub. OmniRoute selects the actual model/provider and forwards the request. SITA retains conversation context, local memory, permissions, security policy, and desktop tool execution.
+SITA uses the Google Gemini Developer API directly for language-model inference. The local SITA router still selects the specialist (Chat, Code, Vision, Creative, or Model Hub); each specialist sends its bounded request to the configured Gemini model. SITA retains conversation context, local memory, permissions, Security policy, and desktop tool execution.
 
-SITA does not directly call Ollama, Gemini, BharatCode, or another model provider for language-model inference. Legacy Ollama adapter/runtime-manager source files remain for compatibility and their isolated tests, but the current SITA launcher does not register or instantiate them. There is no silent local-model fallback: if OmniRoute or its API key is unavailable, the inference request fails closed.
+There is no OmniRoute dependency in the active inference path and no silent fallback to Ollama or another provider. If the Gemini key, model access, quota, or API is unavailable, the request fails closed.
 
-## Windows PowerShell setup
+## Configure on Windows (PowerShell)
 
-Start OmniRoute and confirm the local gateway is reachable at `http://127.0.0.1:20128`.
-
-In the same PowerShell window used to start SITA, set the API key:
+Create a Gemini API key in Google AI Studio, then set it in the same PowerShell window used to launch SITA:
 
 ```powershell
-$env:TARA_OMNIROUTE_API_KEY = Read-Host "OmniRoute API key"
-$env:TARA_OMNIROUTE_BASE_URL = "http://127.0.0.1:20128/v1"
+$env:GEMINI_API_KEY = Read-Host "Gemini API key"
+$env:TARA_GEMINI_MODEL = "gemini-2.5-flash"
 ```
 
-Then launch SITA using `run-tara.bat` or the configured launcher from that same PowerShell session. The key is passed only to the specialist processes that need it. It is not written to TOML, browser storage, frontend bundles, prompts, or logs.
+Do not put the key in `sita.toml`, source files, frontend configuration, prompts, logs, or Git. The launcher passes the key only to explicitly enabled remote model specialists. To persist the key, use Windows User Environment Variables only after considering that other processes running as your user can read user-level environment variables.
 
-To persist the key, use Windows User Environment Variables or PowerShell's `[Environment]::SetEnvironmentVariable(..., "User")` after considering that user-level environment variables are readable by processes running as that user. Never commit the key or paste it into issue reports.
+Copy `sita.example.toml` to `sita.toml`. Each remote specialist must explicitly set `allow_remote = true`; this remains a deliberate privacy opt-in. Set it only for the specialists whose prompts, source attachments, or images you approve sending to Google.
 
-## Configuration and routing
+## Model selection
 
-The example `sita.example.toml` contains:
+The example config uses `gemini-2.5-flash` for Chat, Code, Vision, Creative, and Model Hub. Select a different model by editing `[gemini.models]` or setting a specialist-specific environment variable:
 
-```toml
-[omniroute]
-base_url = "http://127.0.0.1:20128/v1"
+| Specialist | Environment variable |
+|---|---|
+| Chat | `TARA_GEMINI_MODEL` |
+| Code | `TARA_CODE_MODEL` |
+| Vision | `TARA_VISION_MODEL` |
+| Creative | `TARA_CREATIVE_MODEL` |
+| Model Hub | `TARA_MODELS_MODEL` |
 
-[omniroute.models]
-chat = "auto"
-code = "auto/coding:cheap"
-vision = "auto"
-creative = "auto/cheap"
-models = "auto"
-```
+Model names must be Gemini model IDs (for example `gemini-2.5-flash`), not OmniRoute aliases. The Model Hub lists Gemini models exposed to the configured key that support `generateContent`.
 
-These are OmniRoute route aliases, not necessarily concrete model IDs. The route can be changed per specialist in the TOML configuration or with its corresponding environment variable:
+## API and security
 
-Each of the Chat, Code, Vision, Creative, and Model Hub entries in `sita.toml` must explicitly set `allow_remote = true`. This is the opt-in that allows the specialist to send user content through OmniRoute. If it is false or omitted, SITA leaves that specialist disabled; the app does not silently enable remote transfer.
+- Model discovery: `GET https://generativelanguage.googleapis.com/v1beta/models`.
+- Text and multimodal inference: `POST /v1beta/models/{model}:generateContent`.
+- Authentication: `x-goog-api-key: <key>` header. The key is never sent in the URL or query string.
+- Vision images use Gemini `inlineData` parts; the image data is sent to Google's API when Vision is enabled.
+- Requests are non-streaming where the specialist expects a complete response. Redirects are rejected and response sizes/timeouts are bounded.
+- The model output remains untrusted data. It cannot execute host commands, change files, or bypass SITA's local capability registry, security checks, or approval flow.
+- Review Google's current API terms, data handling, quotas, region availability, and billing before sending sensitive content. Do not send passwords, API keys, or confidential workspace material unless you have explicitly accepted that transfer.
 
-| Specialist | Environment variable | Default route |
-|---|---|---|
-| Chat | `TARA_OMNIROUTE_MODEL` | `auto` |
-| Code | `TARA_CODE_MODEL` | `auto/coding:cheap` |
-| Vision | `TARA_VISION_MODEL` | `auto` |
-| Creative | `TARA_CREATIVE_MODEL` | `auto/cheap` |
-| Model Hub | `TARA_MODELS_MODEL` | `auto` |
+## Troubleshooting
 
-OmniRoute must have eligible connected providers/models for each task type. In particular, the selected Vision route must support image input. SITA passes the route alias through; OmniRoute owns underlying provider/model selection and fallback.
+1. Confirm `GEMINI_API_KEY` is set in the same shell that launches SITA.
+2. Check that the key's Google AI project has Gemini API access and that the selected model is available.
+3. A 401/403 generally indicates invalid key or access configuration; 429 indicates quota/rate limiting; a 5xx or timeout may indicate service/provider failure.
+4. Confirm the specialist is enabled in `sita.toml` with `allow_remote = true`.
+5. Check `/api/health` and `/api/models`; Model Hub availability depends on an authenticated model-list request.
 
-## Data handling and security
-
-- Chat prompts, recent conversation history, and relevant saved-memory snippets are sent to OmniRoute for inference.
-- Code questions and any source attachments explicitly supplied to Code are sent to OmniRoute.
-- Creative briefs are sent to OmniRoute.
-- Images submitted to Vision are encoded as OpenAI-compatible image content and sent through OmniRoute. Successful Vision responses include `images_sent_to_remote: true`.
-- Model Hub prompts are sent through OmniRoute. The model catalogue is read from `GET /v1/models`.
-- The selected provider behind OmniRoute may be remote/cloud-based. Review provider configuration, data retention, and billing before sending sensitive material. Do not send passwords, API keys, or confidential workspace contents unless you have explicitly accepted that transfer.
-- Model output is untrusted data. It cannot directly execute host commands, change files, or bypass SITA's local capability registry, security checks, and approval flow.
-- SITA's Windows automation, file operations, memory, and deterministic diagnostics remain local.
-- Optional faster-whisper transcription and browser read-aloud are separate speech features; they are not fallback language models.
-
-## API behavior
-
-- Base URL: `http://127.0.0.1:20128/v1`
-- Model discovery: `GET /models`
-- Inference: `POST /chat/completions`
-- Authentication: `Authorization: Bearer <key>`
-- Requests are non-streaming where the current specialist adapter expects a complete response.
-- Redirects are rejected, requests use the loopback gateway only, and response sizes/timeouts are bounded.
-- Provider response bodies and API keys are not copied into SITA's user-facing error messages or logs.
-
-## Verification and troubleshooting
-
-1. Confirm OmniRoute is running at `http://127.0.0.1:20128`.
-2. Confirm the API key is active in OmniRoute.
-3. Check `GET /v1/models` to confirm the gateway exposes connected models/routes.
-4. Test Chat, Code, Vision, Creative, and Model Hub independently.
-5. Check SITA /api/health: model_gateway.status is healthy only after an authenticated GET /v1/models succeeds. Otherwise the app reports degraded. The specialists object also reports whether Chat, Code, Vision, Creative, and Model Hub are configured or intentionally disabled.
-6. Open /api/models to read the live OmniRoute catalogue. It returns HTTP 503 and an unavailable status when the gateway cannot provide a valid catalogue; it no longer presents an empty, successful model list.
-7. For Vision, ensure the selected route supports image input. A successful gateway health check verifies authentication and catalogue reachability, not that every configured specialist route is eligible for its task.
-8. A 401/403 indicates key or permission configuration; 404 may indicate a wrong API root; 429 indicates quota/rate limiting; 5xx or timeout may indicate provider/routing failure.
-9. If the gateway or key is unavailable, SITA reports the inference provider as unavailable. It must not fall back to direct Ollama or Gemini.
-10. If /api/health reports specialists.chat.status = disabled, inspect the chat [[modules]] entry in sita.toml. Set allow_remote = true only after approving remote prompt transfer through OmniRoute, then restart SITA. SITA deliberately does not change this privacy setting automatically.
-
-The Chat adapter currently uses non-streaming Chat Completions because SITA's conversation adapter expects a complete response string. Streaming UI support is a separate enhancement.
+SITA currently uses the Gemini `generateContent` REST method for specialist requests. Keep the provider transport isolated so it can be moved to Google's newer Interactions API in a later migration without changing specialist permissions or data boundaries.
