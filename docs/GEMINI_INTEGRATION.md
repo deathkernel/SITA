@@ -4,9 +4,15 @@ SITA uses the Google Gemini Developer API directly for language-model inference.
 
 There is no Gemini API dependency in the active inference path and no silent fallback to Ollama or another provider. If the Gemini key, model access, quota, or API is unavailable, the request fails closed.
 
-## Configure on Windows (PowerShell)
+## Configure on Windows
 
-Create a Gemini API key in Google AI Studio. In the SITA repository root, create a local `.env` file (the file is ignored by Git):
+Create a Gemini API key in Google AI Studio. In the SITA repository root, copy the safe template to `.env` (the real `.env` file is ignored by Git):
+
+```cmd
+copy .env.example .env
+```
+
+Then open `.env` in Notepad and replace the placeholder with your key:
 
 ```dotenv
 GEMINI_API_KEY=your_actual_api_key_here
