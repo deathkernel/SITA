@@ -57,14 +57,14 @@ def handle_request(request: Any) -> dict[str, Any]:
         try:
             provider = provider_from_env()
         except (OSError, RuntimeError, ValueError):
-            return _result(request_id, "unavailable", error="OmniRoute provider configuration is unavailable")
+            return _result(request_id, "unavailable", error="Gemini provider configuration is unavailable")
         diagnostic = provider.health_diagnostic()
         if diagnostic is not None:
             return _result(request_id, "unavailable", error=diagnostic)
         return _result(
             request_id,
             "success",
-            {"healthy": True, "provider": "omniroute", "gateway_reachable": True},
+            {"healthy": True, "provider": "gemini", "api_reachable": True},
         )
     if action == "audit_repository":
         question = inputs.get("question")
@@ -171,7 +171,7 @@ def handle_request(request: Any) -> dict[str, Any]:
     return _result(
         request_id,
         "success",
-        {"text": response.text, "provider": "omniroute", "remote_data_transfer": True},
+        {"text": response.text, "provider": "gemini", "remote_data_transfer": True},
         duration_ms=max(0, int((time.monotonic() - start) * 1000)),
     )
 
