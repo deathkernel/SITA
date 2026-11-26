@@ -5,12 +5,12 @@ from tara_creative.service import _gemini_config, execute
 
 
 class GeminiCreativeTests(unittest.TestCase):
-    def setUp(self): self.env={"GEMINI_API_KEY":"test-key","TARA_CREATIVE_MODEL":"gemini-2.5-flash"}
+    def setUp(self): self.env={"GEMINI_API_KEY":"test-key","TARA_CREATIVE_MODEL":"gemini-3.8-flash"}
     def test_creative_generation_uses_gemini_and_marks_remote_transfer(self):
-        with patch.dict(os.environ,self.env,clear=True),patch("tara_creative.service._generate",return_value=("A polished draft","gemini-2.5-flash")):
+        with patch.dict(os.environ,self.env,clear=True),patch("tara_creative.service._generate",return_value=("A polished draft","gemini-3.8-flash")):
             status,data,error=execute("write",{"brief":"Write an introduction"})
         self.assertEqual(status,"success");self.assertIsNone(error)
-        self.assertEqual(data["provider"],"gemini");self.assertEqual(data["model"],"gemini-2.5-flash")
+        self.assertEqual(data["provider"],"gemini");self.assertEqual(data["model"],"gemini-3.8-flash")
         self.assertTrue(data["remote_data_transfer"])
     def test_invalid_gemini_model_is_rejected(self):
         with patch.dict(os.environ,{**self.env,"TARA_CREATIVE_MODEL":"../bad"},clear=True):
