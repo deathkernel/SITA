@@ -100,6 +100,7 @@ class OllamaModelCatalog:
                 stderr=subprocess.DEVNULL,
                 creationflags=creationflags,
                 start_new_session=os.name != "nt",
+                shell=False,
             )
         except OSError as exc:
             raise RuntimeError("TARA-App could not start the local Ollama service") from exc

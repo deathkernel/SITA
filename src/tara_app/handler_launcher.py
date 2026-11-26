@@ -106,6 +106,7 @@ def _build_native() -> Path | None:
             capture_output=True,
             text=True,
             timeout=30,
+            shell=False,
             check=False,
         )
         if configure.returncode != 0:
@@ -116,6 +117,7 @@ def _build_native() -> Path | None:
             capture_output=True,
             text=True,
             timeout=_BUILD_TIMEOUT_SECONDS,
+            shell=False,
             check=False,
         )
         if build.returncode != 0 or not binary.is_file():
@@ -183,6 +185,7 @@ def main() -> int:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                shell=False,
                 check=False,
             )
             if completed.returncode == 0:
