@@ -6,14 +6,14 @@ There is no Gemini API dependency in the active inference path and no silent fal
 
 ## Configure on Windows (PowerShell)
 
-Create a Gemini API key in Google AI Studio, then set it in the same PowerShell window used to launch SITA:
+Create a Gemini API key in Google AI Studio. In the SITA repository root, create a local `.env` file (the file is ignored by Git):
 
-```powershell
-$env:GEMINI_API_KEY = Read-Host "Gemini API key"
-$env:TARA_GEMINI_MODEL = "gemini-3.8-flash"
+```dotenv
+GEMINI_API_KEY=your_actual_api_key_here
+TARA_GEMINI_MODEL=gemini-3.8-flash
 ```
 
-Do not put the key in `sita.toml`, source files, frontend configuration, prompts, logs, or Git. The launcher passes the key only to explicitly enabled remote model specialists. To persist the key, use Windows User Environment Variables only after considering that other processes running as your user can read user-level environment variables.
+SITA loads `.env` automatically from the same directory as the selected `sita.toml`. Existing process environment variables take precedence over `.env`. Keep the real key out of `sita.toml`, source files, frontend configuration, prompts, logs, and Git. The launcher passes the key only to explicitly enabled remote model specialists.
 
 Copy `sita.example.toml` to `sita.toml`. Each remote specialist must explicitly set `allow_remote = true`; this remains a deliberate privacy opt-in. Set it only for the specialists whose prompts, source attachments, or images you approve sending to Google.
 
