@@ -2,7 +2,7 @@
 
 ![SITA brand mark](frontend/public/sita-mark.svg)
 
-**SITA is the user-facing AI assistant/application, not an AI model.** SITA owns conversations, specialist capabilities, memory, permissions, and local desktop actions. OmniRoute is the only language-model gateway: it selects the underlying provider/model and returns inference results to SITA.
+**SITA is the user-facing AI assistant/application, not an AI model.** SITA owns conversations, specialist capabilities, memory, permissions, and local desktop actions. Gemini API is the only language-model gateway: it selects the underlying provider/model and returns inference results to SITA.
 
 Chat, Code, Handler, Router, and the other specialist capabilities are maintained as components inside this `SITA` repository. The app must not depend on deleted sibling model repositories or private cross-repository imports. Chat is a conversation runtime, Code is a coding specialist, and Handler is a deterministic native developer-environment tool; these are not all individual AI models. Actual model inventory and runtime support must be discovered/configured explicitly.
 
@@ -13,8 +13,8 @@ Chat, Code, Handler, Router, and the other specialist capabilities are maintaine
 - One app and unified UI for the SITA ecosystem.
 - Multiple model profiles selectable by task, with model/runtime lifecycle management.
 - Chat, coding, and environment-management workflows integrated as specialist capabilities.
-- One consistent OmniRoute gateway for all language-model inference; SITA does not directly call Ollama, Gemini, or another model provider.
-- Provider selection, quotas, fallback, and model lifecycle are managed by OmniRoute; SITA handles local memory, permissions, desktop actions, and resource-aware orchestration.
+- One consistent Gemini API gateway for all language-model inference; SITA does not directly call Ollama, Gemini, or another model provider.
+- Provider selection, quotas, fallback, and model lifecycle are managed by Gemini API; SITA handles local memory, permissions, desktop actions, and resource-aware orchestration.
 - Clear distinction between an AI model, a model runtime/provider, and a tool/engine.
 - Safe defaults: no arbitrary host command execution, no hidden mutation, and no automatic Git merge.
 
@@ -22,22 +22,22 @@ Chat, Code, Handler, Router, and the other specialist capabilities are maintaine
 
 SITA is being consolidated as a single Python monorepo. The current integrated source packages, all maintained within this repository, are:
 
-- `tara_app`: the local app, capability registry, approval flow, OmniRoute gateway configuration, conversation controls, and safe Markdown chat UI.
+- `tara_app`: the local app, capability registry, approval flow, Gemini API gateway configuration, conversation controls, and safe Markdown chat UI.
 - `tara_router`: a deterministic local router included in this repository; it requires no API key or paid inference.
 - `tara_chat`: the conversation-only specialist, kept separate from Code.
-- `tara_code`: a coding specialist routed through OmniRoute; it returns review-first proposals and never executes code.
+- `tara_code`: a coding specialist routed through Gemini API; it returns review-first proposals and never executes code.
 - `tara_research`: a source-first module that queries free Crossref and Wikipedia public APIs and returns links and excerpts.
 - `tara_planner`: bounded plans with validated dependencies; plans are never executed.
 - `tara_memory`: local SQLite memory; write and delete requests require Security review and per-request approval.
-- `tara_creative`: OmniRoute-routed writing.
+- `tara_creative`: Gemini API-routed writing.
 - `tara_security`: deterministic policy assessment for sensitive capabilities.
 - `tara_action`: local desktop and browser actions plus optional GitHub issue creation; every action is gated by SITA Security and explicit approval, while GitHub writes also require credentials and a repository allowlist.
 - `tara_voice`: optional faster-whisper transcription when compatible wheels are available; read-aloud uses installed local browser voices.
-- `tara_vision`: OmniRoute-routed image analysis; uploaded images are sent through the configured gateway.
+- `tara_vision`: Gemini API-routed image analysis; uploaded images are sent through the configured gateway.
 - `tara_data`: deterministic, read-only CSV summaries.
 - `tara_study`: optional local-first study notes, fill-in-the-blank quizzes, flashcards, and bounded revision plans.
 - `tara_weather`: public Open-Meteo geocoding and weather forecasts, with attribution.
-- `tara_models`: an OmniRoute model catalogue and inference adapter.
+- `tara_models`: an Gemini API model catalogue and inference adapter.
 
 SITA Handler's C++17 source is included in SITA. The launchers explicitly prepare its optional native diagnostic before starting the app; only the environment-diagnosis command is exposed. If CMake or a C++ compiler is unavailable, the app uses read-only Python diagnostics. GitHub issue creation remains inactive until local credentials and a repository allowlist are configured.
 
@@ -52,10 +52,10 @@ SITA (one application)
   |
   +-- UI / sessions / settings / model catalogue
   |
-  +-- OmniRoute Gateway / Model Router
+  +-- Gemini API Gateway / Model Router
   |     +-- Only language-model inference path
-  |     +-- Model/route catalogue exposed by OmniRoute
-  |     +-- Provider selection, fallback, quotas and model lifecycle managed by OmniRoute
+  |     +-- Model/route catalogue exposed by Gemini API
+  |     +-- Provider selection, fallback, quotas and model lifecycle managed by Gemini API
   |
   +-- Task Orchestrator / Capability Registry
         +-- SITA Chat adapter --> conversation + memory
@@ -113,9 +113,9 @@ This layout is a target, not a claim that those modules are already implemented.
 See [runtime and development option notes](docs/runtime-evaluation.md) for the current scope of Amp, GitHub Copilot sandboxing, GitHub Package Firewall, and AWS TorchNeuron. These are optional references, not built-in SITA runtimes. The [native Handler integration notes](docs/native-handler.md) describe its explicit build step and read-only app boundary.
 
 
-## OmniRoute-only AI inference
+## Gemini API-only AI inference
 
-All SITA language-model requests use the local OmniRoute gateway. This includes Chat, Code, Vision, Creative, and Model Hub. SITA's own specialist router still decides which capability handles a task; OmniRoute chooses the underlying model/provider for that inference request.
+All SITA language-model requests use the local Gemini API gateway. This includes Chat, Code, Vision, Creative, and Model Hub. SITA's own specialist router still decides which capability handles a task; Gemini API chooses the underlying model/provider for that inference request.
 
 - **Gateway:** `http://127.0.0.1:20128/v1`
 - **Chat route:** `auto`
@@ -124,15 +124,15 @@ All SITA language-model requests use the local OmniRoute gateway. This includes 
 - **Creative route:** `auto/cheap`
 - **Model Hub route:** `auto`
 - **Authentication:** set `TARA_OMNIROUTE_API_KEY` in the process environment. Never commit the key or place it in frontend configuration.
-- **No local fallback:** if OmniRoute or its API key is unavailable, the affected inference request fails closed. SITA does not silently fall back to direct Ollama or Gemini calls.
+- **No local fallback:** if Gemini API or its API key is unavailable, the affected inference request fails closed. SITA does not silently fall back to direct Ollama or Gemini calls.
 
-The route aliases are passed to OmniRoute; they are not concrete model IDs. Provider availability, model IDs, quotas, billing, and fallback behavior depend on the connected providers and routing policy configured inside OmniRoute.
+The route aliases are passed to Gemini API; they are not concrete model IDs. Provider availability, model IDs, quotas, billing, and fallback behavior depend on the connected providers and routing policy configured inside Gemini API.
 
-**Data handling:** Chat prompts, recent history and relevant saved-memory snippets, creative briefs, and any explicitly supplied code attachments or images are sent to OmniRoute and may be forwarded to a cloud provider configured there. Chat, Code, Vision, Creative, and Model Hub each require `allow_remote = true` in `sita.toml`; otherwise that specialist stays disabled. Do not send secrets or confidential workspace data unless you have reviewed the selected provider and consent to that transfer. Vision reports `images_sent_to_remote=true`. SITA keeps memory, permissions, capability routing, and desktop tool execution on the local machine; model output is never executed as a host command.
+**Data handling:** Chat prompts, recent history and relevant saved-memory snippets, creative briefs, and any explicitly supplied code attachments or images are sent to Gemini API and may be forwarded to a cloud provider configured there. Chat, Code, Vision, Creative, and Model Hub each require `allow_remote = true` in `sita.toml`; otherwise that specialist stays disabled. Do not send secrets or confidential workspace data unless you have reviewed the selected provider and consent to that transfer. Vision reports `images_sent_to_remote=true`. SITA keeps memory, permissions, capability routing, and desktop tool execution on the local machine; model output is never executed as a host command.
 
 Local speech transcription via optional faster-whisper and browser read-aloud are separate speech features, not language-model fallback paths. They remain local when enabled.
 
-See [OmniRoute integration setup](docs/OMNIROUTE_INTEGRATION.md) for Windows configuration and troubleshooting.
+See [Gemini API integration setup](docs/OMNIROUTE_INTEGRATION.md) for Windows configuration and troubleshooting.
 
 ### Web UI selection
 
@@ -140,7 +140,7 @@ The premium React + TypeScript workspace is the primary UI when compiled assets 
 
 The React workspace includes session navigation and search, specialist task starters, session export/delete, drag-and-drop and picker attachments, selected skill packs, scoped approval cards, message edit/regenerate/copy, local read-aloud, activity history, runtime/model status, and the read-only MCP integration catalogue. Its premium motion system uses restrained button sheen, hover elevation, status feedback and panel/message transitions; it respects the operating system's reduced-motion preference and adds no remote font or animation dependency. Its multi-pane layout is inspired by modern coding-agent workspaces; it does not pretend to provide shell execution, arbitrary file editing, diff application, or preview panes. Those remain unavailable until their backend and security boundaries exist.
 
-See [Premium Developer Workspace](docs/PREMIUM_WORKSPACE_UI.md) for the design system, motion rules, feature boundaries, build behavior, and acceptance requirements. Language-model prompts and supported attachments still travel through OmniRoute and may reach the providers configured there; local browser read-aloud uses installed local voices.
+See [Premium Developer Workspace](docs/PREMIUM_WORKSPACE_UI.md) for the design system, motion rules, feature boundaries, build behavior, and acceptance requirements. Language-model prompts and supported attachments still travel through Gemini API and may reach the providers configured there; local browser read-aloud uses installed local voices.
 
 ### Chat experience
 
@@ -150,7 +150,7 @@ Research uses Crossref and Wikipedia public APIs for source records. No API key 
 
 ## Target integration contracts
 
-Adapters should expose health, capabilities, and a structured execute operation. SITA queries OmniRoute for the model catalogue and delegates provider/model selection and lifecycle to the gateway. SITA adapters still enforce request bounds, cancellation, timeouts, local permission checks, and audit reporting. Model identity and route should be recorded for each inference request.
+Adapters should expose health, capabilities, and a structured execute operation. SITA queries Gemini API for the model catalogue and delegates provider/model selection and lifecycle to the gateway. SITA adapters still enforce request bounds, cancellation, timeouts, local permission checks, and audit reporting. Model identity and route should be recorded for each inference request.
 
 Use a versioned request with `schema_version`, `request_id`, `session_id`, `module`, `action`, structured `inputs`, `workspace_root` when applicable, `timeout_seconds`, and `approval_token` when a mutating operation requires approval.
 
@@ -168,26 +168,26 @@ A result should include `schema_version`, `request_id`, `ok`, `status`, structur
 
 ## Local development
 
-SITA now includes the local Router, Chat, Code, Planner, Memory, Creative, Security, Action, Data, Vision, Voice, and Research packages in the same repository. Chat and Code remain distinct specialists. Code suggestions and plans are data only; the current module does not run commands or modify a workspace. Voice transcription uses the optional local faster-whisper package when the Python runtime supports its dependencies; read-aloud uses installed local browser voices. Vision and Creative use OmniRoute; Data performs bounded, read-only CSV analysis.
+SITA now includes the local Router, Chat, Code, Planner, Memory, Creative, Security, Action, Data, Vision, Voice, and Research packages in the same repository. Chat and Code remain distinct specialists. Code suggestions and plans are data only; the current module does not run commands or modify a workspace. Voice transcription uses the optional local faster-whisper package when the Python runtime supports its dependencies; read-aloud uses installed local browser voices. Vision and Creative use Gemini API; Data performs bounded, read-only CSV analysis.
 
 ### Run on Windows
 
-1. Install Python 3.11 or newer and configure a running OmniRoute gateway.
+1. Install Python 3.11 or newer and configure a running Gemini API gateway.
 2. Clone this repository.
-3. Set `$env:TARA_OMNIROUTE_API_KEY = Read-Host 'OmniRoute API key'` in PowerShell.
+3. Set `$env:TARA_OMNIROUTE_API_KEY = Read-Host 'Gemini API API key'` in PowerShell.
 4. Run `.\run-sita.bat` in that same PowerShell window.
 
-The launcher creates a local virtual environment, installs this repository, creates `sita.toml` from the example when needed, prepares the optional native Handler diagnostic, and starts SITA. SITA does not install, start, or call Ollama for language-model inference; the configured OmniRoute gateway handles model routing.
+The launcher creates a local virtual environment, installs this repository, creates `sita.toml` from the example when needed, prepares the optional native Handler diagnostic, and starts SITA. SITA does not install, start, or call Ollama for language-model inference; the configured Gemini API gateway handles model routing.
 
 
 ### Run on macOS or Linux
 
-1. Install Python 3.11 or newer and configure a running OmniRoute gateway.
+1. Install Python 3.11 or newer and configure a running Gemini API gateway.
 2. Clone this repository.
 3. Export `TARA_OMNIROUTE_API_KEY` in the shell environment.
 4. Run `./run-sita.sh` from the repository folder.
 
-The script creates a virtual environment, installs SITA, initializes the local config, explicitly prepares the optional native Handler diagnostic, and starts the app. If a local CMake/C++ toolchain is missing, Handler keeps working through the read-only Python fallback. All language-model requests still go through OmniRoute.
+The script creates a virtual environment, installs SITA, initializes the local config, explicitly prepares the optional native Handler diagnostic, and starts the app. If a local CMake/C++ toolchain is missing, Handler keeps working through the read-only Python fallback. All language-model requests still go through Gemini API.
 
 ### Run from a terminal
 
@@ -208,7 +208,7 @@ If installation previously stopped with `No matching distributions found for onn
 
 ### Consolidation status
 
-The consolidated Router, Chat, Code, Planner, Memory, Creative, Security, Action, Data, Vision, Voice, and Research packages are maintained in this repository. The native Handler source and on-demand adapter are included; the app exposes only environment diagnosis. GitHub issue creation requires local credentials, a repo allowlist, Security review, and one-time user approval. OmniRoute gateway connectivity and provider routing still need an end-to-end smoke test on the target computer.
+The consolidated Router, Chat, Code, Planner, Memory, Creative, Security, Action, Data, Vision, Voice, and Research packages are maintained in this repository. The native Handler source and on-demand adapter are included; the app exposes only environment diagnosis. GitHub issue creation requires local credentials, a repo allowlist, Security review, and one-time user approval. Gemini API gateway connectivity and provider routing still need an end-to-end smoke test on the target computer.
 
 
 ## Study Mode (free and local-first)
@@ -224,27 +224,27 @@ SITA includes an optional, read-only Study specialist for source-grounded notes,
 The first release intentionally avoids pretending deterministic sentence extraction is a full AI tutor. More advanced subject explanations, real MCQ distractors, spaced repetition, OCR, semantic search, and study progress tracking are follow-up batches.
 
 
-## OmniRoute Model Hub and Weather
+## Gemini API Model Hub and Weather
 
-- **Model catalogue:** SITA Model Hub reads the available model list from OmniRoute's `GET /v1/models` endpoint.
-- **Model generation:** Model Hub prompts use OmniRoute's `POST /v1/chat/completions` endpoint. A selected model ID or configured route alias is sent through the gateway.
-- **No direct provider access:** SITA Model Hub no longer calls Gemini APIs or local Ollama endpoints. Model availability, cost, quotas, and access depend on OmniRoute's connected providers.
+- **Model catalogue:** SITA Model Hub reads the available model list from Gemini API's `GET /v1/models` endpoint.
+- **Model generation:** Model Hub prompts use Gemini API's `POST /v1/chat/completions` endpoint. A selected model ID or configured route alias is sent through the gateway.
+- **No direct provider access:** SITA Model Hub no longer calls Gemini APIs or local Ollama endpoints. Model availability, cost, quotas, and access depend on Gemini API's connected providers.
 - **Example prompts:** ask `List available models`, or `Use provider/model-id: explain photosynthesis`.
 - **Weather:** ask `weather in Pune` or `forecast for London for the next 7 days`. SITA uses Open-Meteo's public geocoding and forecast APIs without an API key, includes attribution, and limits response size and network timeouts. Its free endpoint is for non-commercial use and subject to provider rate limits.
 - **Readable answers:** SITA normalizes excessive whitespace and bullet glyphs and uses wider answer cards, consistent line spacing, and clearer heading hierarchy.
 
-### Configure OmniRoute (PowerShell)
+### Configure Gemini API (PowerShell)
 
-1. Start OmniRoute and confirm its local gateway is reachable at `http://127.0.0.1:20128`.
-2. In the same PowerShell window used to start SITA, set `$env:TARA_OMNIROUTE_API_KEY = Read-Host "OmniRoute API key"`.
+1. Start Gemini API and confirm its local gateway is reachable at `http://127.0.0.1:20128`.
+2. In the same PowerShell window used to start SITA, set `$env:TARA_OMNIROUTE_API_KEY = Read-Host "Gemini API API key"`.
 3. Start SITA normally. The example config selects `auto` for Chat, `auto/coding:cheap` for Code, `auto` for Vision, and `auto/cheap` for Creative.
-4. Check `GET /v1/models` through OmniRoute to inspect connected model IDs.
+4. Check `GET /v1/models` through Gemini API to inspect connected model IDs.
 
 Keep the key local and never commit it. If the gateway or key is unavailable, SITA fails closed and does not switch to Ollama or Gemini.
 
 ## Planned integrations: Anthropic ecosystem & MCP
 
-SITA remains a **local app shell**. Language-model inference stays on OmniRoute. The following official Anthropic and Model Context Protocol repositories are reference sources for making specialists more capable **without** giving the model unrestricted host control.
+SITA remains a **local app shell**. Language-model inference stays on Gemini API. The following official Anthropic and Model Context Protocol repositories are reference sources for making specialists more capable **without** giving the model unrestricted host control.
 
 These are **not** vendored into SITA yet. Integration is planned in safety-first order. Patterns are adopted; full products (for example Claude Code on the host desktop) are not.
 
@@ -254,7 +254,7 @@ These are **not** vendored into SITA yet. Integration is planned in safety-first
 |----------|------------|--------------|
 | 1 | [modelcontextprotocol/python-sdk](https://github.com/modelcontextprotocol/python-sdk) | Official MCP Python client/server SDK. Basis for exposing SITA specialists as standard tools/resources behind the existing approval gate. |
 | 1 | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) | Reference MCP servers: scoped **filesystem**, **git**, **fetch**, **memory**, **time**. Patterns for allowlisted, bounded tools only. |
-| 2 | [anthropics/anthropic-sdk-python](https://github.com/anthropics/anthropic-sdk-python) | Official Claude API client, tool runner, and MCP helpers. Optional Claude path remains through OmniRoute (or explicit config); never bypass local policy. |
+| 2 | [anthropics/anthropic-sdk-python](https://github.com/anthropics/anthropic-sdk-python) | Official Claude API client, tool runner, and MCP helpers. Optional Claude path remains through Gemini API (or explicit config); never bypass local policy. |
 | 2 | [anthropics/claude-agent-sdk-python](https://github.com/anthropics/claude-agent-sdk-python) | Agent loop, in-process MCP tools, and hooks. Reference for multi-step Code/Planner flows; proposals stay data-only until approved. |
 | 3 | [anthropics/skills](https://github.com/anthropics/skills) | Agent Skills pack format (instructions + scripts). Reusable Study/Code/Planner skill folders. |
 | 3 | [anthropics/claude-cookbooks](https://github.com/anthropics/claude-cookbooks) | Prompt, tool-use, and evaluation recipes. |
@@ -274,7 +274,7 @@ These are **not** vendored into SITA yet. Integration is planned in safety-first
 - Do not vendor or auto-run **Claude Code** against the host desktop.
 - Do not enable **computer-use** on the real machine without a disposable VM/container sandbox and user approval.
 - Do not expose unrestricted filesystem or shell MCP tools.
-- Do not bypass OmniRoute, `allow_remote`, or the Security approval gate.
+- Do not bypass Gemini API, `allow_remote`, or the Security approval gate.
 
 ### Related docs
 
@@ -301,15 +301,15 @@ sita
 When `src/tara_app/web/react-dist/` exists, the local server serves the compiled React UI at `/` and its hashed assets from `/assets/`. Without a build, it serves the existing static UI. The Vite development server uses `127.0.0.1:5173` and proxies API requests to the local SITA server on `127.0.0.1:8765`.
 
 
-## OmniRoute-only AI inference
+## Gemini API-only AI inference
 
-Chat, Code, Vision, Creative, and Model Hub all use the locally hosted OmniRoute gateway for language-model inference. OmniRoute chooses the underlying model/provider; SITA retains its own capability routing, conversation context, local memory, security policy, and desktop tool execution. See [OmniRoute integration setup](docs/OMNIROUTE_INTEGRATION.md) for Windows configuration. The API key is supplied through the app process environment and must never be committed to the repository or placed in frontend configuration.
+Chat, Code, Vision, Creative, and Model Hub all use the locally hosted Gemini API gateway for language-model inference. Gemini API chooses the underlying model/provider; SITA retains its own capability routing, conversation context, local memory, security policy, and desktop tool execution. See [Gemini API integration setup](docs/OMNIROUTE_INTEGRATION.md) for Windows configuration. The API key is supplied through the app process environment and must never be committed to the repository or placed in frontend configuration.
 
 ## Local repository audit
 
 SITA exposes a read-only repository audit through its local Chat capability. In the app, ask **"Audit this repository"** or **"Check this project"**. The deterministic Router selects `chat.audit_repository`; the Chat adapter scans its configured working directory (the example configuration uses the repository root). The operation does not initialize an LLM, execute shell commands, accept file attachments, modify files, or upload repository content.
 
-The interactive SITA Chat CLI also supports an explicit local command. From the repository folder, start `python -m tara_chat` and enter `/audit`. This read-only command does not require an OmniRoute API key or initialize a model; ordinary chat replies still require a configured OmniRoute gateway.
+The interactive SITA Chat CLI also supports an explicit local command. From the repository folder, start `python -m tara_chat` and enter `/audit`. This read-only command does not require an Gemini API API key or initialize a model; ordinary chat replies still require a configured Gemini API gateway.
 
 ```text
 /audit
@@ -331,7 +331,7 @@ flowchart LR
   User[User] --> UI[SITA Web UI]
   UI --> App[SITA / Orchestrator]
   App --> Specialists[Local specialist capabilities]
-  App --> Gateway[OmniRoute gateway]
+  App --> Gateway[Gemini API gateway]
   Gateway --> Providers[Configured model providers]
   App --> SQLite[(Local SQLite memory)]
   App --> Security[SITA Security / approvals]
@@ -360,13 +360,13 @@ flowchart TB
   Memory --> Security
 ```
 
-### 3. Inference routing — OmniRoute-only boundary
+### 3. Inference routing — Gemini API-only boundary
 
 ```mermaid
 sequenceDiagram
   participant U as User
   participant T as SITA specialist
-  participant O as OmniRoute
+  participant O as Gemini API
   participant P as Configured provider
   U->>T: Request
   T->>T: Validate remote-data setting
@@ -390,7 +390,7 @@ flowchart TD
   C --> D{Requires language-model inference?}
   D -- Yes --> E{Remote data allowed and gateway ready?}
   E -- No --> X[Return explicit failure]
-  E -- Yes --> F[OmniRoute inference]
+  E -- Yes --> F[Gemini API inference]
   D -- No --> G[Bounded deterministic specialist]
   F --> H[Format safe response]
   G --> H
@@ -464,7 +464,7 @@ flowchart LR
   SITA --> Local[(Local sessions / SQLite)]
   SITA --> Research[Crossref / Wikipedia public APIs]
   SITA --> Weather[Open-Meteo public API]
-  SITA --> Omni[OmniRoute]
+  SITA --> Omni[Gemini API]
   Omni --> Cloud[Configured provider, possibly cloud]
   SITA --> Speech[Optional on-device transcription]
   SITA --> CSV[Read-only CSV summaries]
@@ -476,7 +476,7 @@ flowchart LR
 flowchart TB
   App[SITA: product and orchestration] --> Capability[Specialist capability / adapter]
   Capability --> Inference[Model inference request]
-  Inference --> Omni[OmniRoute: routing and provider lifecycle]
+  Inference --> Omni[Gemini API: routing and provider lifecycle]
   Omni --> Runtime[Configured provider / runtime]
   Runtime --> Model[Actual model and weights]
   Capability --> Tool[Deterministic local tool / engine]
@@ -493,7 +493,7 @@ flowchart TD
   VENV --> Config[Initialize local configuration]
   Config --> Handler[Prepare optional Handler diagnostic]
   Handler --> App[Start loopback-bound SITA]
-  App --> Gateway[Configured OmniRoute gateway]
+  App --> Gateway[Configured Gemini API gateway]
 ```
 
 ### 12. Target-only future sandboxed coding workflow — not implemented
@@ -517,11 +517,11 @@ flowchart TD
 
 For the full feature-by-feature architecture reference—including specialist workflows, Chat and memory, Code safety boundary, Research, Planner, security and approvals, Handler, MCP and Skills, Windows floating pet, Voice, Vision, Study, Data, Weather, Model Hub, deployment, failure handling, and conceptual Transformer neural-network diagrams—see **[Feature & Neural-Network Diagrams](docs/FEATURE_AND_NEURAL_NETWORK_DIAGRAMS.md)**.
 
-> Neural-network diagrams are generic Transformer illustrations for the provider-hosted model behind OmniRoute. SITA does not claim to implement or train a neural network or own model weights. Feature status and verification gaps remain tracked in [Remaining Features](docs/REMAINING_FEATURES.md).
+> Neural-network diagrams are generic Transformer illustrations for the provider-hosted model behind Gemini API. SITA does not claim to implement or train a neural network or own model weights. Feature status and verification gaps remain tracked in [Remaining Features](docs/REMAINING_FEATURES.md).
 
 
 ## Token-efficient context and MCP metadata
 
-SITA Chat now builds a bounded request context using a dependency-free UTF-8 token estimate. The current user request and system instructions are reserved first; recent history and relevant saved memories are optional, priority-ranked sections that are omitted whole when they do not fit. The estimate is exposed separately from actual provider usage. When OmniRoute returns usage metadata, SITA captures the reported prompt, completion and total token counts; missing usage remains unknown. The default completion budget remains 1,536 tokens and the initial input-context budget is configurable in the chat runtime constructor (12,000 estimated tokens by default).
+SITA Chat now builds a bounded request context using a dependency-free UTF-8 token estimate. The current user request and system instructions are reserved first; recent history and relevant saved memories are optional, priority-ranked sections that are omitted whole when they do not fit. The estimate is exposed separately from actual provider usage. When Gemini API returns usage metadata, SITA captures the reported prompt, completion and total token counts; missing usage remains unknown. The default completion budget remains 1,536 tokens and the initial input-context budget is configurable in the chat runtime constructor (12,000 estimated tokens by default).
 
 MCP tool discovery caches read-only tool metadata for 20 seconds by default to avoid repeatedly starting stdio servers for the same catalogue. Cache entries are scoped to each server configuration and can be explicitly invalidated. MCP tool descriptions, JSON schemas and returned text have bounded sizes to prevent oversized metadata/results from flooding model context. Tool calls are not cached; approval grants remain one-shot and audit-gated. Set the gateway's `tool_cache_ttl_seconds=0` to disable metadata caching.
