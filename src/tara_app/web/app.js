@@ -35,7 +35,7 @@
       warning.setAttribute("role", "alert");
       warning.textContent = chat.status === "disabled"
         ? "Chat specialist is disabled. In sita.toml, set allow_remote = true in the [[modules]] entry with id = \"chat\" only if you approve sending Chat prompts through Gemini API, then restart SITA. SITA will not change this privacy setting automatically."
-        : "Chat is configured, but its authenticated Gemini API model-catalogue check failed. Verify that Gemini API is running at Google AI Studio project access and that GEMINI_API_KEY is valid, then restart SITA.";
+        : "Chat is configured, but its authenticated Gemini API model-catalogue check failed. Verify that Gemini API is running at Gemini API key and Google AI project access and that GEMINI_API_KEY is valid, then restart SITA.";
       const shell = document.querySelector(".shell");
       const modelPanel = document.querySelector("#model-panel");
       if (shell && modelPanel) shell.insertBefore(warning, modelPanel);
@@ -815,7 +815,7 @@
   async function refreshModelStatus() {
     if (modelPollTimer !== null) window.clearTimeout(modelPollTimer);
     modelPollTimer = null;
-    modelServiceStatus.textContent = "Checking Gemini API model gateway...";
+    modelServiceStatus.textContent = "Checking Gemini API...";
     modelsRefresh.disabled = true;
     modelList.replaceChildren();
     try {
@@ -829,11 +829,11 @@
       const pull = payload.pull || {};
       const pullActive = ["queued", "pulling"].includes(pull.status);
       if (pull.status === "failed") {
-        modelServiceStatus.textContent = pull.message || "Model request failed in the configured Gemini API gateway.";
+        modelServiceStatus.textContent = pull.message || "Model request failed in the configured Gemini API.";
       } else if (pullActive) {
         modelServiceStatus.textContent = "Requesting " + String(pull.model || "local model") + "...";
       } else if (payload.service_available !== true) {
-        modelServiceStatus.textContent = "Gemini API is not responding. Start the local gateway, then refresh.";
+        modelServiceStatus.textContent = "Gemini API is not responding. Check the API key, project access, and network connection, then refresh.";
       } else {
         modelServiceStatus.textContent = "Model routing is managed by Gemini API.";
       }
