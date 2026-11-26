@@ -11,7 +11,6 @@ import time
 from collections.abc import Mapping
 from typing import Any
 
-from tara_app.omniroute_health import check_gateway
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
@@ -20,7 +19,7 @@ MAX_REQUEST_BYTES = 1_000_000
 MAX_RESPONSE_BYTES = 160_000
 MAX_IMAGE_BYTES = 512_000
 _ALLOWED_FIELDS = {"schema_version", "request_id", "session_id", "module", "action", "inputs", "workspace_root", "timeout_seconds", "approval_token"}
-_MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$")
+_MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 
 class _NoRedirect(HTTPRedirectHandler):
