@@ -49,7 +49,7 @@ def _gemini_request(url: str, api_key: str, payload: dict[str, Any] | None = Non
     data=None if payload is None else json.dumps(payload,ensure_ascii=False,separators=(",",":"),allow_nan=False).encode("utf-8")
     req=Request(url,data=data,headers={"x-goog-api-key":api_key,"Content-Type":"application/json","Accept":"application/json"},method="GET" if payload is None else "POST")
     try:
-        with _omniroute_opener().open(req,timeout=timeout) as response: raw=response.read(MAX_RESPONSE_BYTES+1)
+        with _gemini_opener().open(req,timeout=timeout) as response: raw=response.read(MAX_RESPONSE_BYTES+1)
     except HTTPError as exc: raise RuntimeError(f"Gemini API returned HTTP {exc.code}") from None
     except (URLError,TimeoutError,OSError): raise RuntimeError("Gemini API is unavailable") from None
     if len(raw)>MAX_RESPONSE_BYTES: raise RuntimeError("Gemini returned an oversized response")
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     return _result(request_id, "success", {
         "text": text,
         "model": response_model,
-        "provider": "omniroute",
+        "provider": "gemini",
         "execution_performed": False,
         "remote_data_transfer": True,
     }, duration_ms=int((time.monotonic() - started) * 1000))
