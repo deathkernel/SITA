@@ -37,7 +37,7 @@ def _gemini_api_key() -> str:
     return value
 
 def _gemini_model() -> str:
-    value=os.environ.get("TARA_VISION_MODEL",os.environ.get("TARA_GEMINI_MODEL","gemini-2.5-flash")).strip()
+    value=os.environ.get("TARA_VISION_MODEL",os.environ.get("TARA_GEMINI_MODEL","gemini-3.8-flash")).strip()
     if not _MODEL_RE.fullmatch(value): raise ValueError("configured Gemini vision model is invalid")
     return value
 
