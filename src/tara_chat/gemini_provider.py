@@ -43,7 +43,7 @@ def _extract_text(data: dict[str, Any]) -> str:
 
 class GeminiProvider:
     """Gemini REST client with SITA's text completion and model-list contracts."""
-    def __init__(self, *, api_key: str, model: str="gemini-2.5-flash", timeout: float=180.0, transport=None):
+    def __init__(self, *, api_key: str, model: str="gemini-3.8-flash", timeout: float=180.0, transport=None):
         if not isinstance(api_key,str) or not api_key.strip() or len(api_key)>4096 or any(ord(c)<33 or ord(c)==127 for c in api_key):
             raise ValueError("GEMINI_API_KEY must be a non-empty bounded value")
         if not isinstance(model,str) or not _MODEL_RE.fullmatch(model): raise ValueError("Gemini model ID is invalid")
@@ -56,7 +56,7 @@ class GeminiProvider:
     def from_env(cls):
         try: timeout=float(os.getenv("TARA_GEMINI_TIMEOUT_SECONDS","180").strip())
         except ValueError: raise ValueError("TARA_GEMINI_TIMEOUT_SECONDS must be numeric") from None
-        return cls(api_key=os.getenv("GEMINI_API_KEY",""),model=os.getenv("TARA_GEMINI_MODEL","gemini-2.5-flash"),timeout=timeout)
+        return cls(api_key=os.getenv("GEMINI_API_KEY",""),model=os.getenv("TARA_GEMINI_MODEL","gemini-3.8-flash"),timeout=timeout)
     @property
     def last_usage(self):
         value=getattr(self._usage,"value",None)
