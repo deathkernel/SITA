@@ -2,7 +2,7 @@
 
 SITA uses the Google Gemini Developer API directly for language-model inference. The local SITA router still selects the specialist (Chat, Code, Vision, Creative, or Model Hub); each specialist sends its bounded request to the configured Gemini model. SITA retains conversation context, local memory, permissions, Security policy, and desktop tool execution.
 
-There is no OmniRoute dependency in the active inference path and no silent fallback to Ollama or another provider. If the Gemini key, model access, quota, or API is unavailable, the request fails closed.
+There is no Gemini API dependency in the active inference path and no silent fallback to Ollama or another provider. If the Gemini key, model access, quota, or API is unavailable, the request fails closed.
 
 ## Configure on Windows (PowerShell)
 
@@ -29,7 +29,7 @@ The example config uses `gemini-2.5-flash` for Chat, Code, Vision, Creative, and
 | Creative | `TARA_CREATIVE_MODEL` |
 | Model Hub | `TARA_MODELS_MODEL` |
 
-Model names must be Gemini model IDs (for example `gemini-2.5-flash`), not OmniRoute aliases. The Model Hub lists Gemini models exposed to the configured key that support `generateContent`.
+Model names must be Gemini model IDs (for example `gemini-2.5-flash`), not Gemini API aliases. The Model Hub lists Gemini models exposed to the configured key that support `generateContent`.
 
 ## API and security
 
