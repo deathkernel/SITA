@@ -4,7 +4,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from tara_chat.omniroute_provider import OmniRouteProvider
+from tara_chat.gemini_provider import GeminiProvider
 from tara_chat.llm_provider_factory import provider_from_env
 
 
@@ -81,24 +81,24 @@ class OmniRouteProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "chat completion"):
             provider.complete("hello")
 
-    def test_factory_selects_omniroute_only_when_explicitly_enabled(self):
+    def test_factory_selects_gemini_only_when_explicitly_enabled(self):
         env = {
-            "TARA_LLM_BACKEND": "omniroute",
-            "TARA_OMNIROUTE_API_KEY": "test-key",
+            "TARA_LLM_BACKEND": "gemini",
+            "GEMINI_API_KEY": "test-key",
         }
         with patch.dict(os.environ, env, clear=True):
             provider = provider_from_env()
-        self.assertIsInstance(provider, OmniRouteProvider)
-        self.assertEqual(provider.model, "auto")
+        self.assertIsInstance(provider, GeminiProvider)
+        self.assertEqual(provider.model, "gemini-2.5-flash")
 
-    def test_factory_defaults_to_omniroute(self):
-        with patch.dict(os.environ, {"TARA_OMNIROUTE_API_KEY": "test-key"}, clear=True):
+    def test_factory_defaults_to_gemini(self):
+        with patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"}, clear=True):
             provider = provider_from_env()
         self.assertIsInstance(provider, OmniRouteProvider)
 
-    def test_factory_rejects_ollama_backend(self):
-        with patch.dict(os.environ, {"TARA_LLM_BACKEND": "ollama"}, clear=True):
-            with self.assertRaisesRegex(ValueError, "OmniRoute only"):
+    def test_factory_rejects_omniroute_backend(self):
+        with patch.dict(os.environ, {"TARA_LLM_BACKEND": "omniroute", "GEMINI_API_KEY": "test-key"}, clear=True):
+            with self.assertRaisesRegex(ValueError, "Gemini only"):
                 provider_from_env()
 
 
