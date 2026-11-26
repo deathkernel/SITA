@@ -6,6 +6,8 @@ import os
 import re
 import sys
 import tomllib
+
+from dotenv import load_dotenv
 from pathlib import Path
 from typing import Any, Mapping
 from urllib.parse import urlsplit
@@ -81,6 +83,9 @@ def create_application(config_path: str | Path) -> Orchestrator:
     config_file = Path(config_path).expanduser().resolve(strict=True)
     if not config_file.is_file():
         raise RuntimeConfigurationError("configuration path must be a file")
+    # Load secrets from the project-local .env without overriding explicitly
+    # supplied process environment variables. Never commit the actual .env file.
+    load_dotenv(dotenv_path=config_file.parent / ".env", override=False)
     try:
         with config_file.open("rb") as stream:
             config = tomllib.load(stream)
