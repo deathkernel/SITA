@@ -1,17 +1,17 @@
 # SITA configuration template. Copy to sita.toml and adjust only local settings.
 # TARA_* environment variable names remain supported for compatibility.
-# All SITA language-model inference is routed through the local OmniRoute gateway.
-# Keep the API key in TARA_OMNIROUTE_API_KEY (environment variable), never here.
+# All SITA language-model inference uses the Google Gemini Developer API.
+# Set GEMINI_API_KEY in the process environment; never put it in this file.
 
-[omniroute]
-base_url = "http://127.0.0.1:20128/v1"
+[gemini]
+model = "gemini-2.5-flash"
 
-[omniroute.models]
-chat = "auto"
-code = "auto/coding:cheap"
-vision = "auto"
-creative = "auto/cheap"
-models = "auto"
+[gemini.models]
+chat = "gemini-2.5-flash"
+code = "gemini-2.5-flash"
+vision = "gemini-2.5-flash"
+creative = "gemini-2.5-flash"
+models = "gemini-2.5-flash"
 
 [router]
 command = ["{python}", "-m", "tara_router"]
@@ -61,19 +61,19 @@ enable = false
 
 [[modules]]
 id = "chat"
-allow_remote = true # Sends prompts, recent history, and relevant memory snippets through OmniRoute.
+allow_remote = true # Sends prompts, recent history, and relevant memory snippets to Gemini.
 command = ["{python}", "-m", "tara_chat.app_adapter"]
 working_directory = "."
 timeout_seconds = 240
-environment = ["TARA_LLM_BACKEND", "TARA_CHAT_MEMORY_PATH", "TARA_OMNIROUTE_API_KEY", "TARA_OMNIROUTE_BASE_URL", "TARA_OMNIROUTE_MODEL", "TARA_OMNIROUTE_TIMEOUT_SECONDS"]
+environment = ["TARA_LLM_BACKEND", "TARA_CHAT_MEMORY_PATH", "GEMINI_API_KEY", "TARA_GEMINI_MODEL"]
 
 [[modules]]
 id = "code"
-allow_remote = true # Sends the coding request and user-supplied source attachments through OmniRoute.
+allow_remote = true # Sends the coding request and user-supplied source attachments to Gemini.
 command = ["{python}", "-m", "tara_code"]
 working_directory = "."
 timeout_seconds = 180
-environment = ["TARA_CODE_API_BASE_URL", "TARA_CODE_API_KEY", "TARA_CODE_MODEL"]
+environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_CODE_MODEL"]
 
 [[modules]]
 id = "research"
@@ -90,11 +90,11 @@ timeout_seconds = 30
 
 [[modules]]
 id = "vision"
-allow_remote = true # Sends user-supplied images through the configured OmniRoute vision route.
+allow_remote = true # Sends user-supplied images to the configured Gemini vision model.
 command = ["{python}", "-m", "tara_vision"]
 working_directory = "."
 timeout_seconds = 240
-environment = ["TARA_VISION_API_BASE_URL", "TARA_VISION_API_KEY", "TARA_VISION_MODEL"]
+environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_VISION_MODEL"]
 
 [[modules]]
 id = "planner"
@@ -121,7 +121,7 @@ allow_remote = true # Sends the creative brief through OmniRoute.
 command = ["{python}", "-m", "tara_creative"]
 working_directory = "."
 timeout_seconds = 180
-environment = ["TARA_CREATIVE_API_BASE_URL", "TARA_CREATIVE_API_KEY", "TARA_CREATIVE_MODEL"]
+environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_CREATIVE_MODEL"]
 
 [[modules]]
 id = "action"
@@ -165,4 +165,4 @@ command = ["{python}", "-m", "tara_models"]
 working_directory = "."
 timeout_seconds = 180
 allow_remote = true # Model discovery and generation use the configured OmniRoute gateway.
-environment = ["TARA_MODELS_API_BASE_URL", "TARA_MODELS_API_KEY", "TARA_MODELS_MODEL"]
+environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_MODELS_MODEL"]
