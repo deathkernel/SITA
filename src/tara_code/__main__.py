@@ -100,11 +100,12 @@ def handle_request(request: Any) -> dict[str, Any]:
         return _result(request_id, "invalid_request", error="action or inputs are invalid")
     if action == "health":
         try:
-            base_url = _omniroute_base_url()
             api_key = _gemini_api_key()
         except ValueError:
             return _result(request_id, "unavailable", error="Gemini API is not configured")
-        try:\n            _gemini_request("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1",api_key,timeout=15)\n        except RuntimeError:
+        try:
+            _gemini_request("https://generativelanguage.googleapis.com/v1beta/models?pageSize=1",api_key,timeout=15)
+        except RuntimeError:
             return _result(request_id, "unavailable", error="Gemini API is unavailable")
         return _result(request_id, "success", {"healthy": True, "provider": "gemini"})
     if action != "plan":
@@ -114,11 +115,11 @@ def handle_request(request: Any) -> dict[str, Any]:
         return _result(request_id, "invalid_request", error="question must be non-empty bounded text")
     try:
         source = _read_attachments(inputs.get("attachments", []))
-        origin = _omniroute_base_url()
+        
     except ValueError as exc:
         return _result(request_id, "invalid_request", error=str(exc))
     try:
-        api_key = _omniroute_api_key()
+        api_key = _gemini_api_key()
     except ValueError:
         return _result(request_id, "unavailable", error="Gemini API key is not configured")
     model = _gemini_model()
