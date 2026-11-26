@@ -45,6 +45,11 @@ def _gemini_model() -> str:
     return value
 
 
+def _gemini_opener():
+    """Create a direct HTTPS opener that never follows redirects."""
+    return build_opener(ProxyHandler({}), _NoRedirect())
+
+
 def _gemini_request(url: str, api_key: str, payload: dict[str, Any] | None = None, timeout: int = 150) -> dict[str, Any]:
     data=None if payload is None else json.dumps(payload,ensure_ascii=False,separators=(",",":"),allow_nan=False).encode("utf-8")
     req=Request(url,data=data,headers={"x-goog-api-key":api_key,"Content-Type":"application/json","Accept":"application/json"},method="GET" if payload is None else "POST")
