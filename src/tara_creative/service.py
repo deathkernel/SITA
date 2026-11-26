@@ -16,7 +16,7 @@ class _NoRedirect(HTTPRedirectHandler):
 
 def _gemini_config():
     key=os.environ.get("GEMINI_API_KEY","").strip()
-    model=os.environ.get("TARA_CREATIVE_MODEL",os.environ.get("TARA_GEMINI_MODEL","gemini-2.5-flash")).strip()
+    model=os.environ.get("TARA_CREATIVE_MODEL",os.environ.get("TARA_GEMINI_MODEL","gemini-3.8-flash")).strip()
     if not key or len(key)>4096 or any(ord(c)<33 or ord(c)==127 for c in key): raise ValueError("GEMINI_API_KEY is missing or invalid")
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}",model): raise ValueError("Gemini creative model is invalid")
     return key,model
