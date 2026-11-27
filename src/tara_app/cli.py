@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from tara_app.application.bootstrap import RuntimeConfigurationError, create_application
+from tara_app.env_loader import load_env_file
 from tara_app.webapp import serve
 
 
@@ -22,8 +23,12 @@ def main() -> int:
     args = parser.parse_args()
     if args.config == Path("sita.toml") and not args.config.exists() and Path("tara-app.toml").is_file():
         args.config = Path("tara-app.toml")
+
     app = None
     try:
+        # One project-level secret source feeds every Gemini-backed specialist.
+        # Existing process environment values take precedence over .env.
+        load_env_file(args.config.expanduser().resolve().parent / ".env")
         if args.floating_pet and sys.platform != "win32":
             raise RuntimeConfigurationError("--floating-pet is supported on Windows only")
         app = create_application(args.config)
