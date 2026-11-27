@@ -76,7 +76,11 @@ class GeminiProvider:
                 models.append({"id":mid,"provider":"gemini","label":item.get("displayName") or mid,"owned_by":"Google","availability":"Available to the configured Gemini API key."})
         return models
     def generate(self, contents, *, system=None, max_output_tokens=2048, temperature=0.4):
-        body={"contents":contents,"generationConfig":{"maxOutputTokens":max_output_tokens,"temperature":float(temperature)}}
+        generation_config={"maxOutputTokens":max_output_tokens}
+        # Gemini 3.8 Flash rejects legacy sampling controls such as temperature.
+        if not self.model.startswith("gemini-3.8"):
+            generation_config["temperature"]=float(temperature)
+        body={"contents":contents,"generationConfig":generation_config}
         if system and system.strip(): body["systemInstruction"]={"parts":[{"text":system.strip()}]}
         data=self._transport(f"{API_BASE}/models/{quote(self.model,safe='')}:generateContent",api_key=self.api_key,payload=body,timeout=self.timeout)
         usage=data.get("usageMetadata"); normalized={}

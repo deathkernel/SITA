@@ -18,6 +18,7 @@ class GeminiProviderTests(unittest.TestCase):
         self.assertTrue(url.endswith("/models/gemini-3.8-flash:generateContent"))
         self.assertEqual(kw["api_key"],"safe-test-key")
         self.assertEqual(kw["payload"]["systemInstruction"],{"parts":[{"text":"You are SITA"}]})
+        self.assertEqual(kw["payload"]["generationConfig"],{"maxOutputTokens":64})
         self.assertEqual(p.last_usage,{"prompt_tokens":12,"completion_tokens":7,"total_tokens":19})
     def test_catalog_lists_only_generate_content_capable_models(self):
         p=GeminiProvider(api_key="safe-test-key",transport=lambda *a,**k:{"models":[
