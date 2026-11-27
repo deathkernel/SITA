@@ -13,6 +13,51 @@ _MAX_KEY = 120
 _MAX_VALUE = 2000
 _MAX_RESULTS = 20
 
+_SEARCH_SQL = (
+    "SELECT key, value, updated_at FROM memories WHERE "
+    +
+    "(:word_0 = '' OR (instr(lower(key), lower(:word_0)) > 0 OR instr(lower(value), lower(:word_0)) > 0))" 
+    "AND " +
+    "(:word_1 = '' OR (instr(lower(key), lower(:word_1)) > 0 OR instr(lower(value), lower(:word_1)) > 0))" 
+    "AND " +
+    "(:word_2 = '' OR (instr(lower(key), lower(:word_2)) > 0 OR instr(lower(value), lower(:word_2)) > 0))" 
+    "AND " +
+    "(:word_3 = '' OR (instr(lower(key), lower(:word_3)) > 0 OR instr(lower(value), lower(:word_3)) > 0))" 
+    "AND " +
+    "(:word_4 = '' OR (instr(lower(key), lower(:word_4)) > 0 OR instr(lower(value), lower(:word_4)) > 0))" 
+    "AND " +
+    "(:word_5 = '' OR (instr(lower(key), lower(:word_5)) > 0 OR instr(lower(value), lower(:word_5)) > 0))" 
+    "AND " +
+    "(:word_6 = '' OR (instr(lower(key), lower(:word_6)) > 0 OR instr(lower(value), lower(:word_6)) > 0))" 
+    "AND " +
+    "(:word_7 = '' OR (instr(lower(key), lower(:word_7)) > 0 OR instr(lower(value), lower(:word_7)) > 0))" 
+    "AND " +
+    "(:word_8 = '' OR (instr(lower(key), lower(:word_8)) > 0 OR instr(lower(value), lower(:word_8)) > 0))" 
+    "AND " +
+    "(:word_9 = '' OR (instr(lower(key), lower(:word_9)) > 0 OR instr(lower(value), lower(:word_9)) > 0))" 
+    "AND " +
+    "(:word_10 = '' OR (instr(lower(key), lower(:word_10)) > 0 OR instr(lower(value), lower(:word_10)) > 0))" 
+    "AND " +
+    "(:word_11 = '' OR (instr(lower(key), lower(:word_11)) > 0 OR instr(lower(value), lower(:word_11)) > 0))" 
+    "AND " +
+    "(:word_12 = '' OR (instr(lower(key), lower(:word_12)) > 0 OR instr(lower(value), lower(:word_12)) > 0))" 
+    "AND " +
+    "(:word_13 = '' OR (instr(lower(key), lower(:word_13)) > 0 OR instr(lower(value), lower(:word_13)) > 0))" 
+    "AND " +
+    "(:word_14 = '' OR (instr(lower(key), lower(:word_14)) > 0 OR instr(lower(value), lower(:word_14)) > 0))" 
+    "AND " +
+    "(:word_15 = '' OR (instr(lower(key), lower(:word_15)) > 0 OR instr(lower(value), lower(:word_15)) > 0))" 
+    "AND " +
+    "(:word_16 = '' OR (instr(lower(key), lower(:word_16)) > 0 OR instr(lower(value), lower(:word_16)) > 0))" 
+    "AND " +
+    "(:word_17 = '' OR (instr(lower(key), lower(:word_17)) > 0 OR instr(lower(value), lower(:word_17)) > 0))" 
+    "AND " +
+    "(:word_18 = '' OR (instr(lower(key), lower(:word_18)) > 0 OR instr(lower(value), lower(:word_18)) > 0))" 
+    "AND " +
+    "(:word_19 = '' OR (instr(lower(key), lower(:word_19)) > 0 OR instr(lower(value), lower(:word_19)) > 0))"
+    + " ORDER BY updated_at DESC, key LIMIT :limit"
+)
+
 class MemoryStore:
     def __init__(self, path: str | Path | None = None) -> None:
         configured = os.environ.get("TARA_MEMORY_DB", "").strip()
@@ -35,10 +80,10 @@ class MemoryStore:
         if not isinstance(query, str) or not query.strip() or len(query) > _MAX_QUERY:
             raise ValueError("query must contain 1 to 500 characters")
         words = [word for word in query.split() if word][:20]
-        clause = " AND ".join("(instr(lower(key), lower(?)) > 0 OR instr(lower(value), lower(?)) > 0)" for _ in words)
-        params = [item for word in words for item in (word, word)]
+        params = {f"word_{index}": words[index] if index < len(words) else "" for index in range(20)}
+        params["limit"] = max(1, min(limit, _MAX_RESULTS))
         with self._database() as db:
-            rows = db.execute(f"SELECT key, value, updated_at FROM memories WHERE {clause} ORDER BY updated_at DESC, key LIMIT ?", (*params, max(1, min(limit, _MAX_RESULTS)))).fetchall()
+            rows = db.execute(_SEARCH_SQL, params).fetchall()
         return [dict(row) for row in rows]
 
     def store(self, key: str, value: str) -> None:
