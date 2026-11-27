@@ -12,6 +12,7 @@ from typing import Mapping, Sequence
 from tara_app.contracts import AdapterHealth, Capability, ModuleRequest, ModuleResult
 
 _ENV_NAME = re.compile(r"^[A-Z][A-Z0-9_]{0,127}$")
+_DIAGNOSTIC_ARGUMENTS = {"doctor": ("doctor",), "health": ("health",)}
 
 
 class HandlerProcessAdapter:
@@ -30,17 +31,19 @@ class HandlerProcessAdapter:
     ) -> None:
         if isinstance(command, (str, bytes)) or not command or any(not isinstance(arg, str) or not arg or "\x00" in arg for arg in command):
             raise ValueError("Handler command must be a non-empty argument list")
+        configured = tuple(command)
+        action = configured[-1].casefold()
+        arguments = _DIAGNOSTIC_ARGUMENTS.get(action)
         packaged_launcher = (
-            len(command) == 4
-            and command[1:3] == ("-m", "tara_app.handler_launcher")
-            and command[3].casefold() in {"doctor", "health"}
+            len(configured) == 4
+            and configured[1:3] == ("-m", "tara_app.handler_launcher")
         )
-        direct_diagnostic = len(command) == 2 and command[1].casefold() in {"doctor", "health"}
-        if not (packaged_launcher or direct_diagnostic):
+        direct_diagnostic = len(configured) == 2
+        if arguments is None or not (packaged_launcher or direct_diagnostic):
             raise ValueError("Handler adapter only permits the packaged launcher or a doctor/health command")
         if not 1 <= timeout_seconds <= 120 or not 256 <= max_response_bytes <= 1_000_000:
             raise ValueError("Handler timeout or response limit is outside the allowed range")
-        self.command = tuple(command)
+        self.command = (configured[0], *(("-m", "tara_app.handler_launcher") if packaged_launcher else ()), *arguments)
         self.working_directory = Path(working_directory).expanduser().resolve(strict=True)
         if not self.working_directory.is_dir():
             raise ValueError("Handler working_directory must be an existing directory")
