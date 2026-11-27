@@ -15,47 +15,27 @@ _MAX_RESULTS = 20
 
 _SEARCH_SQL = (
     "SELECT key, value, updated_at FROM memories WHERE "
-    +
-    "(:word_0 = '' OR (instr(lower(key), lower(:word_0)) > 0 OR instr(lower(value), lower(:word_0)) > 0))" 
-    "AND " +
-    "(:word_1 = '' OR (instr(lower(key), lower(:word_1)) > 0 OR instr(lower(value), lower(:word_1)) > 0))" 
-    "AND " +
-    "(:word_2 = '' OR (instr(lower(key), lower(:word_2)) > 0 OR instr(lower(value), lower(:word_2)) > 0))" 
-    "AND " +
-    "(:word_3 = '' OR (instr(lower(key), lower(:word_3)) > 0 OR instr(lower(value), lower(:word_3)) > 0))" 
-    "AND " +
-    "(:word_4 = '' OR (instr(lower(key), lower(:word_4)) > 0 OR instr(lower(value), lower(:word_4)) > 0))" 
-    "AND " +
-    "(:word_5 = '' OR (instr(lower(key), lower(:word_5)) > 0 OR instr(lower(value), lower(:word_5)) > 0))" 
-    "AND " +
-    "(:word_6 = '' OR (instr(lower(key), lower(:word_6)) > 0 OR instr(lower(value), lower(:word_6)) > 0))" 
-    "AND " +
-    "(:word_7 = '' OR (instr(lower(key), lower(:word_7)) > 0 OR instr(lower(value), lower(:word_7)) > 0))" 
-    "AND " +
-    "(:word_8 = '' OR (instr(lower(key), lower(:word_8)) > 0 OR instr(lower(value), lower(:word_8)) > 0))" 
-    "AND " +
-    "(:word_9 = '' OR (instr(lower(key), lower(:word_9)) > 0 OR instr(lower(value), lower(:word_9)) > 0))" 
-    "AND " +
-    "(:word_10 = '' OR (instr(lower(key), lower(:word_10)) > 0 OR instr(lower(value), lower(:word_10)) > 0))" 
-    "AND " +
-    "(:word_11 = '' OR (instr(lower(key), lower(:word_11)) > 0 OR instr(lower(value), lower(:word_11)) > 0))" 
-    "AND " +
-    "(:word_12 = '' OR (instr(lower(key), lower(:word_12)) > 0 OR instr(lower(value), lower(:word_12)) > 0))" 
-    "AND " +
-    "(:word_13 = '' OR (instr(lower(key), lower(:word_13)) > 0 OR instr(lower(value), lower(:word_13)) > 0))" 
-    "AND " +
-    "(:word_14 = '' OR (instr(lower(key), lower(:word_14)) > 0 OR instr(lower(value), lower(:word_14)) > 0))" 
-    "AND " +
-    "(:word_15 = '' OR (instr(lower(key), lower(:word_15)) > 0 OR instr(lower(value), lower(:word_15)) > 0))" 
-    "AND " +
-    "(:word_16 = '' OR (instr(lower(key), lower(:word_16)) > 0 OR instr(lower(value), lower(:word_16)) > 0))" 
-    "AND " +
-    "(:word_17 = '' OR (instr(lower(key), lower(:word_17)) > 0 OR instr(lower(value), lower(:word_17)) > 0))" 
-    "AND " +
-    "(:word_18 = '' OR (instr(lower(key), lower(:word_18)) > 0 OR instr(lower(value), lower(:word_18)) > 0))" 
-    "AND " +
-    "(:word_19 = '' OR (instr(lower(key), lower(:word_19)) > 0 OR instr(lower(value), lower(:word_19)) > 0))"
-    + " ORDER BY updated_at DESC, key LIMIT :limit"
+    "(:word_0 = '' OR (instr(lower(key), lower(:word_0)) > 0 OR instr(lower(value), lower(:word_0)) > 0)) "
+    "(:word_1 = '' OR (instr(lower(key), lower(:word_1)) > 0 OR instr(lower(value), lower(:word_1)) > 0)) "
+    "(:word_2 = '' OR (instr(lower(key), lower(:word_2)) > 0 OR instr(lower(value), lower(:word_2)) > 0)) "
+    "(:word_3 = '' OR (instr(lower(key), lower(:word_3)) > 0 OR instr(lower(value), lower(:word_3)) > 0)) "
+    "(:word_4 = '' OR (instr(lower(key), lower(:word_4)) > 0 OR instr(lower(value), lower(:word_4)) > 0)) "
+    "(:word_5 = '' OR (instr(lower(key), lower(:word_5)) > 0 OR instr(lower(value), lower(:word_5)) > 0)) "
+    "(:word_6 = '' OR (instr(lower(key), lower(:word_6)) > 0 OR instr(lower(value), lower(:word_6)) > 0)) "
+    "(:word_7 = '' OR (instr(lower(key), lower(:word_7)) > 0 OR instr(lower(value), lower(:word_7)) > 0)) "
+    "(:word_8 = '' OR (instr(lower(key), lower(:word_8)) > 0 OR instr(lower(value), lower(:word_8)) > 0)) "
+    "(:word_9 = '' OR (instr(lower(key), lower(:word_9)) > 0 OR instr(lower(value), lower(:word_9)) > 0)) "
+    "(:word_10 = '' OR (instr(lower(key), lower(:word_10)) > 0 OR instr(lower(value), lower(:word_10)) > 0)) "
+    "(:word_11 = '' OR (instr(lower(key), lower(:word_11)) > 0 OR instr(lower(value), lower(:word_11)) > 0)) "
+    "(:word_12 = '' OR (instr(lower(key), lower(:word_12)) > 0 OR instr(lower(value), lower(:word_12)) > 0)) "
+    "(:word_13 = '' OR (instr(lower(key), lower(:word_13)) > 0 OR instr(lower(value), lower(:word_13)) > 0)) "
+    "(:word_14 = '' OR (instr(lower(key), lower(:word_14)) > 0 OR instr(lower(value), lower(:word_14)) > 0)) "
+    "(:word_15 = '' OR (instr(lower(key), lower(:word_15)) > 0 OR instr(lower(value), lower(:word_15)) > 0)) "
+    "(:word_16 = '' OR (instr(lower(key), lower(:word_16)) > 0 OR instr(lower(value), lower(:word_16)) > 0)) "
+    "(:word_17 = '' OR (instr(lower(key), lower(:word_17)) > 0 OR instr(lower(value), lower(:word_17)) > 0)) "
+    "(:word_18 = '' OR (instr(lower(key), lower(:word_18)) > 0 OR instr(lower(value), lower(:word_18)) > 0)) "
+    "(:word_19 = '' OR (instr(lower(key), lower(:word_19)) > 0 OR instr(lower(value), lower(:word_19)) > 0)) "
+    "ORDER BY updated_at DESC, key LIMIT :limit"
 )
 
 class MemoryStore:
