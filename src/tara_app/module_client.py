@@ -112,12 +112,12 @@ class StdioModuleAdapter:
                 env=self._safe_environment(),
                 timeout=timeout,
                 shell=False,
-                check=False,
+                check=True,
             )
+        except subprocess.CalledProcessError as exc:
+            raise ModuleProcessError("module process returned a failure status") from exc
         except (OSError, subprocess.TimeoutExpired) as exc:
             raise ModuleProcessError("module process is unavailable or timed out") from exc
-        if completed.returncode != 0:
-            raise ModuleProcessError("module process returned a failure status")
         output = completed.stdout.encode("utf-8")
         if len(output) > self.max_response_bytes:
             raise ModuleProcessError("module response exceeds the configured limit")
