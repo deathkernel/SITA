@@ -43,7 +43,8 @@ class HandlerProcessAdapter:
             raise ValueError("Handler adapter only permits the packaged launcher or a doctor/health command")
         if not 1 <= timeout_seconds <= 120 or not 256 <= max_response_bytes <= 1_000_000:
             raise ValueError("Handler timeout or response limit is outside the allowed range")
-        self.command = (configured[0], *(("-m", "tara_app.handler_launcher") if packaged_launcher else ()), *arguments)
+        self.executable = configured[0]
+        self.arguments = (("-m", "tara_app.handler_launcher", *arguments) if packaged_launcher else arguments)
         self.working_directory = Path(working_directory).expanduser().resolve(strict=True)
         if not self.working_directory.is_dir():
             raise ValueError("Handler working_directory must be an existing directory")
@@ -59,10 +60,10 @@ class HandlerProcessAdapter:
         return (Capability("handler", "diagnose", "Inspect the local developer environment", True),)
 
     def health(self) -> AdapterHealth:
-        executable = Path(self.command[0])
+        executable = Path(self.executable)
         if not executable.is_absolute() and (self.working_directory / executable).is_file():
             return AdapterHealth("healthy")
-        if executable.is_file() or shutil.which(self.command[0], path=os.environ.get("PATH", "")):
+        if executable.is_file() or shutil.which(self.executable, path=os.environ.get("PATH", "")):
             return AdapterHealth("healthy")
         return AdapterHealth("unavailable", "configured Handler executable is not available")
 
@@ -71,7 +72,7 @@ class HandlerProcessAdapter:
             return ModuleResult("permission_denied", error="Handler adapter only permits read-only diagnostics")
         try:
             completed = subprocess.run(
-                self.command,
+                [self.executable, *self.arguments],
                 stdin=subprocess.DEVNULL,
                 capture_output=True,
                 text=True,
