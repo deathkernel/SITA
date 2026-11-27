@@ -1,7 +1,6 @@
 # SITA configuration template. Copy to sita.toml and adjust only local settings.
-# Gemini model IDs are configured in [gemini.models]; the API key is supplied via GEMINI_API_KEY.
-# All SITA language-model inference uses the Google Gemini Developer API.
-# Set GEMINI_API_KEY in the process environment; never put it in this file.
+# Put GEMINI_API_KEY in the project-root .env file; it is injected centrally.
+# Never put secrets in this TOML file or in individual module environment lists.
 
 [gemini]
 model = "gemini-3.8-flash"
@@ -57,7 +56,7 @@ enable = false
 # read_only = true
 # read_only_tools = ["status", "log", "show_file"]
 # timeout_seconds = 30
-# # Set TARA_MCP_GIT_ROOTS=/abs/path/to/repos before launch
+# # Set TARA_MCP_GIT_ROOTS=/abs/path/to/repos before starting SITA
 
 [[modules]]
 id = "chat"
@@ -65,7 +64,7 @@ allow_remote = true # Sends prompts, recent history, and relevant memory snippet
 command = ["{python}", "-m", "tara_chat.app_adapter"]
 working_directory = "."
 timeout_seconds = 240
-environment = ["TARA_LLM_BACKEND", "TARA_CHAT_MEMORY_PATH", "GEMINI_API_KEY", "TARA_GEMINI_MODEL"]
+environment = ["TARA_LLM_BACKEND", "TARA_CHAT_MEMORY_PATH"]
 
 [[modules]]
 id = "code"
@@ -73,7 +72,6 @@ allow_remote = true # Sends the coding request and user-supplied source attachme
 command = ["{python}", "-m", "tara_code"]
 working_directory = "."
 timeout_seconds = 180
-environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_CODE_MODEL"]
 
 [[modules]]
 id = "research"
@@ -94,7 +92,6 @@ allow_remote = true # Sends user-supplied images to the configured Gemini vision
 command = ["{python}", "-m", "tara_vision"]
 working_directory = "."
 timeout_seconds = 240
-environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_VISION_MODEL"]
 
 [[modules]]
 id = "planner"
@@ -121,7 +118,6 @@ allow_remote = true # Sends the creative brief to Gemini.
 command = ["{python}", "-m", "tara_creative"]
 working_directory = "."
 timeout_seconds = 180
-environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_CREATIVE_MODEL"]
 
 [[modules]]
 id = "action"
@@ -165,4 +161,3 @@ command = ["{python}", "-m", "tara_models"]
 working_directory = "."
 timeout_seconds = 180
 allow_remote = true # Model discovery and generation use the Gemini Developer API.
-environment = ["GEMINI_API_KEY", "TARA_GEMINI_MODEL", "TARA_MODELS_MODEL"]
